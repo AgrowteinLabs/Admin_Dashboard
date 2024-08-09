@@ -1,0 +1,122 @@
+// Common Styles for Cards
+.card {
+  background-color: var(--secondary-color);
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.1) 25%, transparent 25%), linear-gradient(225deg, rgba(255,255,255,0.1) 25%, transparent 25%);
+  background-position: center;
+  background-size: 15px 15px;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: var(--light-shadow1);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--medium-shadow1);
+  }
+
+  .card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-color-inverted);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+
+    svg {
+      margin-right: 12px;
+      color: var(--primary-color);
+      animation: rotateIcon 2s linear infinite;
+    }
+  }
+
+  .card-content {
+    font-size: 16px;
+    color: var(--base-text-color);
+    line-height: 1.8;
+    max-height: 400px; /* Limit the height to make it scrollable */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+
+  @keyframes rotateIcon {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+// Specific Styles for CreateUser Component
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    font-weight: 700;
+    color: var(--text-color-inverted);
+    margin-bottom: 10px;
+    display: block;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg-color);
+    color: var(--base-text-color);
+    font-size: 16px;
+    box-shadow: var(--light-shadow1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 10px var(--primary-color);
+    }
+  }
+
+  button {
+    padding: 14px 24px;
+    background-image: linear-gradient(135deg, var(--primary-color-light), var(--primary-color-dark));
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-image 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+      background-image: linear-gradient(135deg, var(--primary-color-dark), var(--primary-color-light));
+      transform: translateY(-4px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Layout for the entire content area
+.content-area-charts {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: auto auto;
+  gap: 24px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Add this for creating a scrollable form inside the card
+.scrollable-form {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px; /* For padding right to avoid overlap with scrollbar */
+}

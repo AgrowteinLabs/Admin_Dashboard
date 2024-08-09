@@ -1,0 +1,31 @@
+.content-area-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  .area-top-title {
+    color: var(--text-color-inverted);
+  }
+
+  .area-top-l {
+    display: flex;
+    align-items: center;
+    column-gap: 6px;
+  }
+
+
+  .time-display {
+    padding: 8px;
+    border-radius: 4px;
+    background-color: var(--secondary-color);
+    box-shadow: var(--light-shadow1);
+
+    .current-time {
+      color: var(--base-text-color);
+      font-weight: bold;
+      font-size: 18px;
+    }
+  }
+}
