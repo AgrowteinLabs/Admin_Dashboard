@@ -1,7 +1,14 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  esbuild: {
-    target: 'esnext', // or 'es2022'
-  },
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api/': {
+        target: 'https://agrowteinlabs.onrender.com',
+        changeOrigin: true,
+      }
+    }
+  }
 });
