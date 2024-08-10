@@ -182,7 +182,9 @@ const CreateUser = ({ user = {}, onSubmit, onCancel }) => {
             <button type="submit" className="submit-button">
               {user.id ? "Save Changes" : "Create User"}
             </button>
-            <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
+            <button type="button" className="cancel-button" onClick={onCancel}>
+              Cancel
+            </button>
           </div>
         </form>
       </div>
