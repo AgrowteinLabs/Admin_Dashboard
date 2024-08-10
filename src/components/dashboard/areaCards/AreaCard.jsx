@@ -1,9 +1,23 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { FiUsers, FiServer, FiCalendar } from "react-icons/fi";
+import data from "./apifetch";
 
 const AreaCard = ({ colors, cardInfo, type }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [userCount, setUserCount] = useState(null);
+  const [sensorCount, setSensorCount] = useState(null);
+
+  useEffect(() => {
+    // Fetch the data when the component mounts
+    const fetchData = async () => {
+      const { usersdata, sensorsdata } = await data();
+      setUserCount(usersdata.length);
+      setSensorCount(sensorsdata.length);
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (type === "date") {
@@ -18,9 +32,9 @@ const AreaCard = ({ colors, cardInfo, type }) => {
   const renderValue = () => {
     switch (type) {
       case "users":
-        return "150"; // Replace with actual total users value
+        return userCount !== null ? userCount : "Loading..."; // Show user count when available
       case "sensors":
-        return "25"; // Replace with actual total sensors value
+        return sensorCount !== null ? sensorCount : "Loading..."; // Show sensor count when available
       case "date":
         return currentDate.toLocaleDateString();
       default:
