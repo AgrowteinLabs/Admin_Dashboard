@@ -1,5 +1,3 @@
-
-
 export default async function data(){
     try{
     const Users = await fetch('https://agrowteinlabs.onrender.com/api/v1/users');
@@ -9,6 +7,6 @@ export default async function data(){
     return { usersdata, sensorsdata };
 }
     catch(err){
-        return err;
-    }
+        return err;
+    }
 };
