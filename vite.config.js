@@ -8,7 +8,7 @@ export default defineConfig({
       '/api/': {
         target: 'https://agrowteinlabs.onrender.com',
         changeOrigin: true,
-      }
-    }
-  }
+      }
+    }
+  }
 });
