@@ -1,24 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MdPerson,
   MdEdit,
   MdDelete,
   MdAddCircle,
 } from 'react-icons/md';
-import CreateUser from './CreateUser'; // Import the CreateUser component
+import CreateUser from './CreateUser';
 import "./UserManagement.scss";
+import { usersFetch } from './usersFetch'; 
+import { CircularProgress } from '@mui/material';
 
-const initialUsers = [
-  { id: 1, username: "john.doe", name: "John Doe", email: "john.doe@example.com", role: "Admin" },
-  { id: 2, username: "jane.smith", name: "Jane Smith", email: "jane.smith@example.com", role: "User" },
-  { id: 3, username: "alice.johnson", name: "Alice Johnson", email: "alice.johnson@example.com", role: "User" },
-  { id: 4, username: "bob.brown", name: "Bob Brown", email: "bob.brown@example.com", role: "Moderator" },
-];
 
 const UserManagement = () => {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]); 
   const [isAddingUser, setIsAddingUser] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Add isLoading state
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const fetchedData = await usersFetch(); // Await the data fetching
+        const simplifiedData = fetchedData.map(user => ({
+          id: user._id, // Unique identifier from the fetched data
+          username: user.email.split('@')[0], // giving username as email before @
+          name: user.fullName,
+          email: user.email,
+          role: user.role.charAt(0).toUpperCase() + user.role.slice(1) // just adding capitalization for first letter
+        }));
+        setUsers(simplifiedData); // Update state with fetched and mapped data
+        setIsLoading(false); // Set isLoading to false after data is fetched
+      } catch (error) {
+        console.error("Error fetching data:", error); // Handle any errors
+        setIsLoading(false); // Set isLoading to false in case of error
+      }
+    };
+
+    fetchData(); // Call the async function
+  }, []); // Empty dependency array to run once on mount
 
   const handleAddUser = (newUser) => {
     setUsers([...users, { id: users.length + 1, ...newUser }]);
@@ -64,28 +83,32 @@ const UserManagement = () => {
 
       {!isAddingUser && !editingUser && (
         <div className="user-grid">
-          {users.map((user) => (
-            <div key={user.id} className="user-card">
-              <div className="user-info">
-                <span className="user-icon">
-                  <MdPerson size={48} />
-                </span>
-                <h2>{user.name}</h2>
-                <p>{user.email}</p>
-                <p><strong>Role:</strong> {user.role}</p>
+          {isLoading ? ( // Render CircularProgress if isLoading is true
+            <CircularProgress size={40} />
+          ) : (
+            users.map((user) => (
+              <div key={user.id} className="user-card">
+                <div className="user-info">
+                  <span className="user-icon">
+                    <MdPerson size={48} />
+                  </span>
+                  <h2>{user.name}</h2>
+                  <p>{user.email}</p>
+                  <p><strong>Role:</strong> {user.role}</p>
+                </div>
+                <div className="user-actions">
+                  <button className="edit-button" onClick={() => setEditingUser(user)}>
+                    <MdEdit size={20} />
+                    Edit
+                  </button>
+                  <button className="delete-button" onClick={() => handleDeleteUser(user.id)}>
+                    <MdDelete size={20} />
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="user-actions">
-                <button className="edit-button" onClick={() => setEditingUser(user)}>
-                  <MdEdit size={20} />
-                  Edit
-                </button>
-                <button className="delete-button" onClick={() => handleDeleteUser(user.id)}>
-                  <MdDelete size={20} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
     </div>

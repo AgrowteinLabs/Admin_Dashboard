@@ -1,35 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { FaUserPlus } from "react-icons/fa";
 import "../../components/dashboard/areaCharts/AreaCharts.scss";
+import { userCreation } from './userCreation'; // Adjust the import path as needed
 
-const CreateUser = ({ user = {}, onSubmit, onCancel }) => {
+const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => {
   const [formData, setFormData] = useState({
-    username: user.username || "",
-    password: user.password || "",
     name: user.name || "",
     email: user.email || "",
+    password: user.password || "",
     phoneNumber: user.phoneNumber || "",
-    addressLine1: user.addressLine1 || "",
-    addressLine2: user.addressLine2 || "",
-    landmark: user.landmark || "",
-    pincode: user.pincode || "",
+    city: user.city || "",
     state: user.state || "",
-    district: user.district || "",
-    productType: user.productType || "",
-    sensorsUsed: user.sensorsUsed || "",
-    deviceId: user.deviceId || ""
+    country: user.country || "India", // Default country
+    postalCode: user.postalCode || ""
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
-      ...prevData, [name]: value
+      ...prevData,
+      [name]: value
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ ...user, ...formData });
+    const userData = mapFormDataToUserData(formData);
+
+    try {
+      const result = await userCreation(userData);
+      // console.log("User data submitted:", JSON.stringify(userData));
+      onSubmit(result); // Pass the result to the onSubmit callback
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
+  };
+
+  const mapFormDataToUserData = (formData) => {
+    return {
+      address: {
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
+        postalCode: formData.postalCode
+      },
+      fullName: formData.name,
+      email: formData.email,
+      phoneNumber: formData.phoneNumber,
+      password: formData.password,
+    };
   };
 
   return (
@@ -40,26 +59,6 @@ const CreateUser = ({ user = {}, onSubmit, onCancel }) => {
       </h4>
       <div className="card-content">
         <form onSubmit={handleSubmit} className="scrollable-form">
-          <div className="form-group">
-            <label>Username:</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Password:</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required={!user.id} // Password is required only when creating a new user
-            />
-          </div>
           <div className="form-group">
             <label>Name:</label>
             <input
@@ -81,6 +80,16 @@ const CreateUser = ({ user = {}, onSubmit, onCancel }) => {
             />
           </div>
           <div className="form-group">
+            <label>Password:</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required={!user.id} // Password required only when creating a new user
+            />
+          </div>
+          <div className="form-group">
             <label>Phone Number:</label>
             <input
               type="tel"
@@ -91,39 +100,11 @@ const CreateUser = ({ user = {}, onSubmit, onCancel }) => {
             />
           </div>
           <div className="form-group">
-            <label>Address Line 1:</label>
+            <label>City:</label>
             <input
               type="text"
-              name="addressLine1"
-              value={formData.addressLine1}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Address Line 2:</label>
-            <input
-              type="text"
-              name="addressLine2"
-              value={formData.addressLine2}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label>Landmark:</label>
-            <input
-              type="text"
-              name="landmark"
-              value={formData.landmark}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="form-group">
-            <label>Pincode:</label>
-            <input
-              type="text"
-              name="pincode"
-              value={formData.pincode}
+              name="city"
+              value={formData.city}
               onChange={handleChange}
               required
             />
@@ -139,41 +120,11 @@ const CreateUser = ({ user = {}, onSubmit, onCancel }) => {
             />
           </div>
           <div className="form-group">
-            <label>District:</label>
+            <label>Postal Code:</label>
             <input
               type="text"
-              name="district"
-              value={formData.district}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Type of Product:</label>
-            <input
-              type="text"
-              name="productType"
-              value={formData.productType}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Sensors Used:</label>
-            <input
-              type="text"
-              name="sensorsUsed"
-              value={formData.sensorsUsed}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label>Device ID:</label>
-            <input
-              type="text"
-              name="deviceId"
-              value={formData.deviceId}
+              name="postalCode"
+              value={formData.postalCode}
               onChange={handleChange}
               required
             />
@@ -182,7 +133,9 @@ const CreateUser = ({ user = {}, onSubmit, onCancel }) => {
             <button type="submit" className="submit-button">
               {user.id ? "Save Changes" : "Create User"}
             </button>
-            <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
+            <button type="button" className="cancel-button" onClick={onCancel}>
+              Cancel
+            </button>
           </div>
         </form>
       </div>
