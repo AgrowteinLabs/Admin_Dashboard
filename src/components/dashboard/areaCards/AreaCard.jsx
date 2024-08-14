@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { FiUsers, FiServer, FiCalendar } from "react-icons/fi";
 import data from "./apifetch";
+import { CircularProgress } from "@mui/material";
 
 const AreaCard = ({ colors, cardInfo, type }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -32,9 +33,9 @@ const AreaCard = ({ colors, cardInfo, type }) => {
   const renderValue = () => {
     switch (type) {
       case "users":
-        return userCount !== null ? userCount : "Loading..."; // Show user count when available
+        return userCount !== null ? userCount : <CircularProgress/>; // Show user count when available
       case "sensors":
-        return sensorCount !== null ? sensorCount : "Loading..."; // Show sensor count when available
+        return sensorCount !== null ? sensorCount : <CircularProgress/>; // Show sensor count when available
       case "date":
         return currentDate.toLocaleDateString();
       default:

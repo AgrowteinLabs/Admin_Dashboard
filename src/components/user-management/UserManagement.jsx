@@ -7,8 +7,9 @@ import {
 } from 'react-icons/md';
 import CreateUser from './CreateUser';
 import "./UserManagement.scss";
-import { usersFetch } from './usersFetch'; 
+import { usersFetch } from './userslistFetch'; 
 import { CircularProgress } from '@mui/material';
+import userDelete from './deleteUser';
 
 
 const UserManagement = () => {
@@ -51,6 +52,8 @@ const UserManagement = () => {
 
   const handleDeleteUser = (userId) => {
     setUsers(users.filter(user => user.id !== userId));
+    userDelete(userId); // Call the delete function
+
   };
 
   return (
