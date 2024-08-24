@@ -5,6 +5,7 @@ import {
   MdDelete,
   MdSensors,
 } from 'react-icons/md';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import "./SensorManagement.scss";
 
 const initialSensors = [
@@ -24,6 +25,8 @@ const SensorManagement = () => {
   const [sensorsPerPage] = useState(6);
   const [isAddingSensor, setIsAddingSensor] = useState(false);
   const [editingSensor, setEditingSensor] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [sensorToDelete, setSensorToDelete] = useState(null);
 
   const indexOfLastSensor = currentPage * sensorsPerPage;
   const indexOfFirstSensor = indexOfLastSensor - sensorsPerPage;
@@ -41,7 +44,19 @@ const SensorManagement = () => {
   };
 
   const handleDeleteSensor = (sensorId) => {
-    setSensors(sensors.filter(sensor => sensor.id !== sensorId));
+    setSensorToDelete(sensorId);
+    setOpen(true);
+  };
+
+  const confirmDeleteSensor = () => {
+    setSensors(sensors.filter(sensor => sensor.id !== sensorToDelete));
+    setOpen(false);
+    setSensorToDelete(null);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSensorToDelete(null);
   };
 
   const handlePageChange = (pageNumber) => {
@@ -109,6 +124,31 @@ const SensorManagement = () => {
           onPageChange={handlePageChange}
         />
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete this sensor?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Deleting this sensor cannot be undone. Are you sure you want to continue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteSensor} color="secondary" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaUserPlus } from "react-icons/fa";
-import "../../components/dashboard/areaCharts/AreaCharts.scss";
+import "./UserManagement.scss"
 import { userCreation } from './userCreation'; // Adjust the import path as needed
 
 const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => {

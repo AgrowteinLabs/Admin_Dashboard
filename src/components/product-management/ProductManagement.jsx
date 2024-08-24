@@ -5,6 +5,7 @@ import {
   MdDelete,
   MdLocalFlorist,
 } from 'react-icons/md';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import "./ProductManagement.scss";
 
 const initialProducts = [
@@ -24,6 +25,8 @@ const ProductManagement = () => {
   const [productsPerPage] = useState(6);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -41,7 +44,19 @@ const ProductManagement = () => {
   };
 
   const handleDeleteProduct = (productId) => {
-    setProducts(products.filter(product => product.id !== productId));
+    setProductToDelete(productId);
+    setOpen(true);
+  };
+
+  const confirmDeleteProduct = () => {
+    setProducts(products.filter(product => product.id !== productToDelete));
+    setOpen(false);
+    setProductToDelete(null);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setProductToDelete(null);
   };
 
   const handlePageChange = (pageNumber) => {
@@ -109,6 +124,31 @@ const ProductManagement = () => {
           onPageChange={handlePageChange}
         />
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete this product?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Deleting this product cannot be undone. Are you sure you want to continue?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={confirmDeleteProduct} color="secondary" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

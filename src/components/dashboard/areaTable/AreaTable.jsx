@@ -1,15 +1,9 @@
+import React, { useState } from "react";
 import AreaTableAction from "./AreaTableAction";
+import EditUserForm from "./EditUserForm"; // Make sure this import is correct
 import "./AreaTable.scss";
 
-const TABLE_HEADS = [
-  "Name",
-  "User ID",
-  "Email",
-  "Status",
-  "Role",
-  "Action",
-];
-
+const TABLE_HEADS = ["Name", "User ID", "Email", "Status", "Role", "Action"];
 const TABLE_DATA = [
   {
     id: 100,
@@ -54,6 +48,20 @@ const TABLE_DATA = [
 ];
 
 const AreaTable = () => {
+  const [tableData, setTableData] = useState(TABLE_DATA);
+  const [editingUser, setEditingUser] = useState(null);
+
+  const handleEdit = (user) => {
+    setEditingUser(user); // Set the editing user
+  };
+
+  const handleSave = (updatedUser) => {
+    setTableData((prevData) =>
+      prevData.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+    );
+    setEditingUser(null); // Reset editing user
+  };
+
   return (
     <section className="content-area-table">
       <div className="data-table-info">
@@ -63,36 +71,35 @@ const AreaTable = () => {
         <table>
           <thead>
             <tr>
-              {TABLE_HEADS?.map((th, index) => (
+              {TABLE_HEADS.map((th, index) => (
                 <th key={index}>{th}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {TABLE_DATA?.map((dataItem) => {
-              return (
-                <tr key={dataItem.id}>
-                  <td>{dataItem.name}</td>
-                  <td>{dataItem.user_id}</td>
-                  <td>{dataItem.email}</td>
-                  <td>
-                    <div className="dt-status">
-                      <span
-                        className={`dt-status-dot dot-${dataItem.status}`}
-                      ></span>
-                      <span className="dt-status-text">{dataItem.status}</span>
-                    </div>
-                  </td>
-                  <td>{dataItem.role}</td>
-                  <td className="dt-cell-action">
-                    <AreaTableAction />
-                  </td>
-                </tr>
-              );
-            })}
+            {tableData.map((user) => (
+              <tr key={user.id}>
+                <td>{user.name}</td>
+                <td>{user.user_id}</td>
+                <td>{user.email}</td>
+                <td>
+                  <div className="dt-status">
+                    <span className={`dt-status-dot dot-${user.status}`}></span>
+                    <span className="dt-status-text">{user.status}</span>
+                  </div>
+                </td>
+                <td>{user.role}</td>
+                <td className="dt-cell-action">
+                  <AreaTableAction user={user} onEdit={handleEdit} />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
+      {editingUser && (
+        <EditUserForm user={editingUser} onSave={handleSave} />
+      )}
     </section>
   );
 };

@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { HiDotsHorizontal } from "react-icons/hi";
-import { Link } from "react-router-dom";
 
-const AreaTableAction = () => {
+const AreaTableAction = ({ user, onEdit }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const handleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
-
+  const handleDropdown = () => setShowDropdown(!showDropdown);
   const dropdownRef = useRef(null);
 
   const handleClickOutside = (event) => {
@@ -35,14 +31,17 @@ const AreaTableAction = () => {
           <div className="action-dropdown-menu" ref={dropdownRef}>
             <ul className="dropdown-menu-list">
               <li className="dropdown-menu-item">
-                <Link to="/edit" className="dropdown-menu-link">
+                <span
+                  className="dropdown-menu-link"
+                  onClick={() => onEdit(user)}
+                >
                   Edit
-                </Link>
+                </span>
               </li>
               <li className="dropdown-menu-item">
-                <Link to="/delete" className="dropdown-menu-link">
+                <span className="dropdown-menu-link">
                   Delete
-                </Link>
+                </span>
               </li>
             </ul>
           </div>
