@@ -1,40 +1,62 @@
 import React, { useState } from 'react';
 import { FaUserPlus } from "react-icons/fa";
-import "./AreaCharts.scss";
+import "./AreaCharts";
 import { userCreation } from './userCreation'; // Adjust the import path as needed
 
 const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => {
   const [formData, setFormData] = useState({
-    name: user.name || "",
+    name: user.fullName || "",
     email: user.email || "",
     password: user.password || "",
     phoneNumber: user.phoneNumber || "",
-    city: user.city || "",
-    state: user.state || "",
-    country: user.country || "India", // Default country
-    postalCode: user.postalCode || ""
+    city: user.address?.city || "",
+    state: user.address?.state || "",
+    country: user.address?.country || "India", // Default country
+    postalCode: user.address?.postalCode || "",
+    role: user.role || "user", // Default role
+    termsAgreement: user.termsAgreement || false,
+    privacyPolicyAgreement: user.privacyPolicyAgreement || false,
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userData = mapFormDataToUserData(formData);
-
+  
     try {
       const result = await userCreation(userData);
-      // console.log("User data submitted:", JSON.stringify(userData));
+      console.log('User created:', result); // Log success for debugging
       onSubmit(result); // Pass the result to the onSubmit callback
     } catch (error) {
-      console.error("Error creating user:", error);
+      if (error.response) {
+        // Check for conflict (email already exists)
+        if (error.response.status === 409) {
+          alert('A user with this email already exists. Please use a different email.');
+        } else if (error.response.status === 400) {
+          // Handle bad request errors
+          alert('There was an issue with the provided data. Please check and try again.');
+        } else {
+          // Handle other error codes
+          alert('An unexpected error occurred. Please try again later.');
+        }
+        console.error('Error response:', error.response.data); // Log detailed error response
+      } else {
+        // Network or other errors
+        console.error('Error creating user:', error.message);
+        alert('An error occurred while creating the user. Please try again.');
+      }
     }
   };
+  
+  
+  
 
   const mapFormDataToUserData = (formData) => {
     return {
@@ -42,12 +64,15 @@ const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => 
         city: formData.city,
         state: formData.state,
         country: formData.country,
-        postalCode: formData.postalCode
+        postalCode: formData.postalCode,
       },
       fullName: formData.name,
       email: formData.email,
       phoneNumber: formData.phoneNumber,
       password: formData.password,
+      role: formData.role,
+      termsAgreement: formData.termsAgreement,
+      privacyPolicyAgreement: formData.privacyPolicyAgreement,
     };
   };
 
@@ -120,6 +145,16 @@ const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => 
             />
           </div>
           <div className="form-group">
+            <label>Country:</label>
+            <input
+              type="text"
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
             <label>Postal Code:</label>
             <input
               type="text"
@@ -128,6 +163,42 @@ const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => 
               onChange={handleChange}
               required
             />
+          </div>
+          <div className="form-group">
+            <label>Role:</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div className="form-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="termsAgreement"
+                checked={formData.termsAgreement}
+                onChange={handleChange}
+                required
+              />
+              I agree to the terms of service
+            </label>
+          </div>
+          <div className="form-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="privacyPolicyAgreement"
+                checked={formData.privacyPolicyAgreement}
+                onChange={handleChange}
+                required
+              />
+              I agree to the privacy policy
+            </label>
           </div>
           <div className="form-actions">
             <button type="submit" className="submit-button">

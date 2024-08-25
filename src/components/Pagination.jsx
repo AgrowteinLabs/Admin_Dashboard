@@ -1,5 +1,5 @@
 import React from 'react';
-import './user-management/UserManagement.scss';
+import './user-management/UserManagement.scss'; // Ensure this path is correct
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const getVisiblePages = (currentPage, totalPages) => {

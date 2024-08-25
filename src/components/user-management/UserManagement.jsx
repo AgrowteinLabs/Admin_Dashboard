@@ -5,12 +5,12 @@ import {
   MdDelete,
   MdAddCircle,
 } from 'react-icons/md';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Snackbar } from '@mui/material';
 import CreateUser from './CreateUser';
 import { usersFetch } from './userslistFetch';
 import { CircularProgress } from '@mui/material';
 import userDelete from './deleteUser';
-import Pagination from '../Pagination'; // Import the Pagination component
+import Pagination from '../Pagination';
 import "./UserManagement.scss";
 
 const UserManagement = () => {
@@ -22,42 +22,56 @@ const UserManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const fetchedData = await usersFetch();
-        const simplifiedData = fetchedData.map(user => ({
-          id: user._id,
-          username: user.email.split('@')[0],
-          name: user.fullName,
-          email: user.email,
-          role: user.role.charAt(0).toUpperCase() + user.role.slice(1)
-        }));
-        setUsers(simplifiedData);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(users.length / usersPerPage);
-
-  const handleAddUser = (newUser) => {
-    setUsers([...users, { id: users.length + 1, ...newUser }]);
-    setIsAddingUser(false);
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const fetchedData = await usersFetch();
+      const simplifiedData = fetchedData.map(user => ({
+        id: user._id,
+        username: user.email.split('@')[0],
+        name: user.fullName,
+        email: user.email,
+        role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
+        address: user.address,
+        phoneNumber: user.phoneNumber
+      }));
+      setUsers(simplifiedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditUser = (updatedUser) => {
-    setUsers(users.map(user => user.id === updatedUser.id ? updatedUser : user));
+  const handleAddUser = (newUser) => {
+    setUsers((prevUsers) => [...prevUsers, newUser]);
+    setIsAddingUser(false);
+    setSnackbarMessage("User created successfully!");
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleEditUser = (user) => {
+    setEditingUser(user);
+  };
+
+  const handleUpdateUser = (updatedUser) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
+    );
     setEditingUser(null);
+    setSnackbarMessage("User updated successfully!");
+    setSnackbarOpen(true);
   };
 
   const handleDeleteUser = (userId) => {
@@ -65,17 +79,28 @@ const UserManagement = () => {
     setOpen(true);
   };
 
-  const confirmDeleteUser = () => {
-    setUsers(users.filter(user => user.id !== userToDelete));
-    userDelete(userToDelete);
-    setOpen(false);
-    setUserToDelete(null);
+  const confirmDeleteUser = async () => {
+    try {
+      await userDelete(userToDelete);
+      setUsers((prevUsers) => prevUsers.filter(user => user.id !== userToDelete));
+      setOpen(false);
+      setUserToDelete(null);
+      setSnackbarMessage("User deleted successfully!");
+      setSnackbarOpen(true);
+    } catch (error) {
+      alert("Failed to delete the user. Please try again.");
+    }
   };
 
   const handleClose = () => {
     setOpen(false);
     setUserToDelete(null);
   };
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(users.length / usersPerPage);
 
   return (
     <div className="user-management-page">
@@ -100,7 +125,7 @@ const UserManagement = () => {
       {editingUser && (
         <CreateUser
           user={editingUser}
-          onSubmit={handleEditUser}
+          onSubmit={handleUpdateUser}
           onCancel={() => setEditingUser(null)}
         />
       )}
@@ -122,7 +147,7 @@ const UserManagement = () => {
                     <p><strong>Role:</strong> {user.role}</p>
                   </div>
                   <div className="user-actions">
-                    <button className="edit-button" onClick={() => setEditingUser(user)}>
+                    <button className="edit-button" onClick={() => handleEditUser(user)}>
                       <MdEdit size={20} />
                       Edit
                     </button>
@@ -135,10 +160,6 @@ const UserManagement = () => {
               ))
             )}
           </div>
-          <br />
-          <br />
-          <br />
-          <br />
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -147,7 +168,6 @@ const UserManagement = () => {
         </>
       )}
 
-      {/* Confirmation Dialog */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -171,6 +191,15 @@ const UserManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar for success messages */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        message={snackbarMessage}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      />
     </div>
   );
 };

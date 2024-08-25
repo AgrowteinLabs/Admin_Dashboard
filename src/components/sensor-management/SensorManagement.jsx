@@ -1,26 +1,15 @@
-import React, { useState } from 'react';
-import {
-  MdAddCircle,
-  MdEdit,
-  MdDelete,
-  MdSensors,
-} from 'react-icons/md';
+import React, { useState, useEffect } from 'react';
+import { MdAddCircle, MdEdit, MdDelete, MdSensors } from 'react-icons/md';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import sensorsListFetch from './sensorsListFetch';
+import sensorCreation from './sensorCreation';
+import deleteSensor from './deleteSensor';
+import Pagination from '../Pagination'; // Ensure the path is correct
+import SensorForm from './SensorForm'; // Import the SensorForm
 import "./SensorManagement.scss";
 
-const initialSensors = [
-  { id: 1, name: "Temperature Sensor", description: "Monitors temperature levels in the environment." },
-  { id: 2, name: "Humidity Sensor", description: "Measures the amount of moisture in the air." },
-  { id: 3, name: "pH Sensor", description: "Checks the pH level of soil or water." },
-  { id: 4, name: "Water Level Sensor", description: "Monitors water levels in tanks or reservoirs." },
-  { id: 5, name: "Light Sensor", description: "Measures light intensity in a given area." },
-  { id: 6, name: "Pressure Sensor", description: "Detects and measures pressure in various applications." },
-  { id: 7, name: "Soil Moisture Sensor", description: "Measures the water content in the soil." },
-  // Add more sensors as needed
-];
-
 const SensorManagement = () => {
-  const [sensors, setSensors] = useState(initialSensors);
+  const [sensors, setSensors] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sensorsPerPage] = useState(6);
   const [isAddingSensor, setIsAddingSensor] = useState(false);
@@ -28,19 +17,49 @@ const SensorManagement = () => {
   const [open, setOpen] = useState(false);
   const [sensorToDelete, setSensorToDelete] = useState(null);
 
-  const indexOfLastSensor = currentPage * sensorsPerPage;
-  const indexOfFirstSensor = indexOfLastSensor - sensorsPerPage;
-  const currentSensors = sensors.slice(indexOfFirstSensor, indexOfLastSensor);
-  const totalPages = Math.ceil(sensors.length / sensorsPerPage);
+  // Fetch sensors from the API when the component mounts
+  useEffect(() => {
+    fetchSensors();
+  }, []);
 
-  const handleAddSensor = (newSensor) => {
-    setSensors([...sensors, { id: sensors.length + 1, ...newSensor }]);
-    setIsAddingSensor(false);
+  const fetchSensors = async () => {
+    try {
+      const fetchedSensors = await sensorsListFetch();
+      setSensors(fetchedSensors);
+    } catch (error) {
+      console.error("Error fetching sensors:", error);
+      alert("Failed to fetch sensors. Please try again later.");
+    }
   };
 
-  const handleEditSensor = (updatedSensor) => {
-    setSensors(sensors.map(sensor => sensor.id === updatedSensor.id ? updatedSensor : sensor));
-    setEditingSensor(null);
+  const handleAddSensor = async (newSensor) => {
+    try {
+      const addedSensor = await sensorCreation(newSensor);
+      setSensors((prevSensors) => [...prevSensors, addedSensor]);
+      setIsAddingSensor(false);
+    } catch (error) {
+      console.error("Error creating sensor:", error);
+      alert("Failed to create sensor. Please try again.");
+    }
+  };
+
+  const handleEditSensor = (sensor) => {
+    setEditingSensor(sensor);
+  };
+
+  const handleUpdateSensor = async (updatedSensor) => {
+    try {
+      const response = await axios.put(`/api/v1/sensors/${updatedSensor.id}`, updatedSensor);
+      setSensors((prevSensors) =>
+        prevSensors.map((sensor) =>
+          sensor.id === updatedSensor.id ? response.data : sensor
+        )
+      );
+      setEditingSensor(null);
+    } catch (error) {
+      console.error("Error updating sensor:", error);
+      alert("Failed to update sensor. Please try again.");
+    }
   };
 
   const handleDeleteSensor = (sensorId) => {
@@ -48,10 +67,18 @@ const SensorManagement = () => {
     setOpen(true);
   };
 
-  const confirmDeleteSensor = () => {
-    setSensors(sensors.filter(sensor => sensor.id !== sensorToDelete));
-    setOpen(false);
-    setSensorToDelete(null);
+  const confirmDeleteSensor = async () => {
+    try {
+      await deleteSensor(sensorToDelete);
+      setSensors((prevSensors) =>
+        prevSensors.filter((sensor) => sensor.id !== sensorToDelete)
+      );
+      setOpen(false);
+      setSensorToDelete(null);
+    } catch (error) {
+      console.error("Error deleting sensor:", error);
+      alert("Failed to delete sensor. Please try again.");
+    }
   };
 
   const handleClose = () => {
@@ -62,6 +89,11 @@ const SensorManagement = () => {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const indexOfLastSensor = currentPage * sensorsPerPage;
+  const indexOfFirstSensor = indexOfLastSensor - sensorsPerPage;
+  const currentSensors = sensors.slice(indexOfFirstSensor, indexOfLastSensor);
+  const totalPages = Math.ceil(sensors.length / sensorsPerPage);
 
   return (
     <div className="sensor-management-page">
@@ -86,43 +118,44 @@ const SensorManagement = () => {
       {editingSensor && (
         <SensorForm
           sensor={editingSensor}
-          onSubmit={handleEditSensor}
+          onSubmit={handleUpdateSensor}
           onCancel={() => setEditingSensor(null)}
         />
       )}
 
       {!isAddingSensor && !editingSensor && (
-        <div className="sensor-grid">
-          {currentSensors.map((sensor) => (
-            <div key={sensor.id} className="sensor-card">
-              <div className="sensor-info">
-                <span className="sensor-icon">
-                  <MdSensors size={48} />
-                </span>
-                <h2>{sensor.name}</h2>
-                <p>{sensor.description}</p>
+        <>
+          <div className="sensor-grid">
+            {currentSensors.map((sensor) => (
+              <div key={sensor.id} className="sensor-card">
+                <div className="sensor-info">
+                  <span className="sensor-icon">
+                    <MdSensors size={48} />
+                  </span>
+                  <h2>{sensor.name}</h2>
+                  <p>{sensor.description}</p>
+                </div>
+                <div className="sensor-actions">
+                  <button className="edit-button" onClick={() => handleEditSensor(sensor)}>
+                    <MdEdit size={20} />
+                    Edit
+                  </button>
+                  <button className="delete-button" onClick={() => handleDeleteSensor(sensor.id)}>
+                    <MdDelete size={20} />
+                    Delete
+                  </button>
+                </div>
               </div>
-              <div className="sensor-actions">
-                <button className="edit-button" onClick={() => setEditingSensor(sensor)}>
-                  <MdEdit size={20} />
-                  Edit
-                </button>
-                <button className="delete-button" onClick={() => handleDeleteSensor(sensor.id)}>
-                  <MdDelete size={20} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
 
-      {!isAddingSensor && !editingSensor && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+          {/* Pagination Component */}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
       )}
 
       {/* Confirmation Dialog */}
@@ -149,78 +182,6 @@ const SensorManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
-  );
-};
-
-const SensorForm = ({ sensor = {}, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: sensor.name || "",
-    description: sensor.description || "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData, [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({ ...sensor, ...formData });
-  };
-
-  return (
-    <div className="sensor-form">
-      <h2>{sensor.id ? "Edit Sensor" : "Add New Sensor"}</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Description:</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-actions">
-          <button type="submit" className="submit-button">Save</button>
-          <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
-        </div>
-      </form>
-    </div>
-  );
-};
-
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const pageNumbers = [];
-
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
-
-  return (
-    <div className="pagination">
-      {pageNumbers.map(number => (
-        <button
-          key={number}
-          className={`page-button ${number === currentPage ? "active" : ""}`}
-          onClick={() => onPageChange(number)}
-        >
-          {number}
-        </button>
-      ))}
     </div>
   );
 };

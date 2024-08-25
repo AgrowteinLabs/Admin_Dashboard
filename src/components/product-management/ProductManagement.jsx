@@ -1,26 +1,14 @@
-import React, { useState } from 'react';
-import {
-  MdAddCircle,
-  MdEdit,
-  MdDelete,
-  MdLocalFlorist,
-} from 'react-icons/md';
+import React, { useState, useEffect } from 'react';
+import { MdAddCircle, MdEdit, MdDelete, MdLocalFlorist } from 'react-icons/md';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import productsListFetch from './productsListFetch';
+import deleteProduct from './deleteProduct';
+import productCreation from './productCreation'; // Correct import statement
+import ProductForm from './ProductForm';
 import "./ProductManagement.scss";
 
-const initialProducts = [
-  { id: 1, name: "Agventure", description: "Advanced agricultural solutions for modern farming." },
-  { id: 2, name: "Hydroponics Automation", description: "Automated hydroponic systems for efficient growth." },
-  { id: 3, name: "Mushroom Farm Automation", description: "State-of-the-art automation for mushroom farming." },
-  { id: 4, name: "Green House Automation", description: "Control and monitor greenhouse environments efficiently." },
-  { id: 5, name: "Aquaponics Automation", description: "Integrated systems for aquaponics farming." },
-  { id: 6, name: "Smart Irrigation", description: "Smart systems for efficient water usage in agriculture." },
-  { id: 7, name: "Soil Monitoring", description: "Advanced soil monitoring systems for optimized farming." },
-  // Add more products as needed
-];
-
 const ProductManagement = () => {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(6);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
@@ -28,19 +16,48 @@ const ProductManagement = () => {
   const [open, setOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
-  const handleAddProduct = (newProduct) => {
-    setProducts([...products, { id: products.length + 1, ...newProduct }]);
-    setIsAddingProduct(false);
+  const fetchProducts = async () => {
+    try {
+      const fetchedProducts = await productsListFetch();
+      setProducts(fetchedProducts);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      alert("Failed to fetch products. Please try again later.");
+    }
   };
 
-  const handleEditProduct = (updatedProduct) => {
-    setProducts(products.map(product => product.id === updatedProduct.id ? updatedProduct : product));
-    setEditingProduct(null);
+  const handleAddProduct = async (newProduct) => {
+    try {
+      const addedProduct = await productCreation(newProduct);
+      setProducts((prevProducts) => [...prevProducts, addedProduct]);
+      setIsAddingProduct(false);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      alert("Failed to create product. Please try again.");
+    }
+  };
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+  };
+
+  const handleUpdateProduct = async (updatedProduct) => {
+    try {
+      const response = await axios.put(`/api/v1/products/${updatedProduct.id}`, updatedProduct);
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === updatedProduct.id ? response.data : product
+        )
+      );
+      setEditingProduct(null);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert("Failed to update product. Please try again.");
+    }
   };
 
   const handleDeleteProduct = (productId) => {
@@ -48,10 +65,18 @@ const ProductManagement = () => {
     setOpen(true);
   };
 
-  const confirmDeleteProduct = () => {
-    setProducts(products.filter(product => product.id !== productToDelete));
-    setOpen(false);
-    setProductToDelete(null);
+  const confirmDeleteProduct = async () => {
+    try {
+      await deleteProduct(productToDelete);
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== productToDelete)
+      );
+      setOpen(false);
+      setProductToDelete(null);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      alert("Failed to delete product. Please try again.");
+    }
   };
 
   const handleClose = () => {
@@ -62,6 +87,11 @@ const ProductManagement = () => {
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   return (
     <div className="product-management-page">
@@ -86,7 +116,7 @@ const ProductManagement = () => {
       {editingProduct && (
         <ProductForm
           product={editingProduct}
-          onSubmit={handleEditProduct}
+          onSubmit={handleUpdateProduct}
           onCancel={() => setEditingProduct(null)}
         />
       )}
@@ -103,7 +133,7 @@ const ProductManagement = () => {
                 <p>{product.description}</p>
               </div>
               <div className="product-actions">
-                <button className="edit-button" onClick={() => setEditingProduct(product)}>
+                <button className="edit-button" onClick={() => handleEditProduct(product)}>
                   <MdEdit size={20} />
                   Edit
                 </button>
@@ -117,15 +147,6 @@ const ProductManagement = () => {
         </div>
       )}
 
-      {!isAddingProduct && !editingProduct && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
-
-      {/* Confirmation Dialog */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -149,78 +170,6 @@ const ProductManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
-  );
-};
-
-const ProductForm = ({ product = {}, onSubmit, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: product.name || "",
-    description: product.description || "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData, [name]: value
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({ ...product, ...formData });
-  };
-
-  return (
-    <div className="product-form">
-      <h2>{product.id ? "Edit Product" : "Add New Product"}</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Name:</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label>Description:</label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="form-actions">
-          <button type="submit" className="submit-button">Save</button>
-          <button type="button" className="cancel-button" onClick={onCancel}>Cancel</button>
-        </div>
-      </form>
-    </div>
-  );
-};
-
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const pageNumbers = [];
-
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
-
-  return (
-    <div className="pagination">
-      {pageNumbers.map(number => (
-        <button
-          key={number}
-          className={`page-button ${number === currentPage ? "active" : ""}`}
-          onClick={() => onPageChange(number)}
-        >
-          {number}
-        </button>
-      ))}
     </div>
   );
 };

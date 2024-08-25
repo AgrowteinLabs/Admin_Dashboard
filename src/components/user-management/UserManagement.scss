@@ -47,7 +47,7 @@
   }
 
   .user-card {
-    background-color: var(--card-background-color);
+    background-color: var(--secondary-color);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -219,3 +219,95 @@
   }
 }
 
+// Specific Styles for CreateUser Component
+.create-user-card .form-group {
+  margin-bottom: 20px;
+
+  label {
+    font-weight: 700;
+    color: var(--text-color-inverted);
+    margin-bottom: 10px;
+    display: block;
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--input-border-color); /* Dynamic border color */
+    background-color: var(--input-bg-color);
+    color: var(--text-color-inverted); /* Input text color */
+    font-size: 16px;
+    box-shadow: var(--light-shadow1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 10px var(--primary-color);
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+
+    button {
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .submit-button {
+      background-color: var(--primary-color);
+      color: #fff;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background-color: var(--primary-color-dark); /* Make sure this is defined */
+        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    .cancel-button {
+      background-color: #ccc;
+      color: #333;
+      margin-left: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background-color: #bbb;
+        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+}
+
+
+.success-message {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  text-align: center;
+}
