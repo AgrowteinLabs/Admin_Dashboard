@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { FiUsers, FiServer, FiCalendar } from "react-icons/fi";
-import data from "./apifetch";
+import data from "../../../api/apifetch";
 import { CircularProgress } from "@mui/material";
 
 const AreaCard = ({ colors, cardInfo, type }) => {

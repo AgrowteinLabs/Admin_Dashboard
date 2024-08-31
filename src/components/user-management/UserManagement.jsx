@@ -7,9 +7,9 @@ import {
 } from 'react-icons/md';
 import CreateUser from './CreateUser';
 import "./UserManagement.scss";
-import { usersFetch } from './userslistFetch'; 
+import { usersFetch } from '../../api/userslistFetch'; 
 import { CircularProgress } from '@mui/material';
-import userDelete from './deleteUser';
+import userDelete from '../../api/deleteUser';
 
 
 const UserManagement = () => {

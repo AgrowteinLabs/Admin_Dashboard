@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaUserPlus } from "react-icons/fa";
 import "./AreaCharts.scss";
-import { userCreation } from './userCreation'; // Adjust the import path as needed
+import { userCreation } from '../../../api/userCreation'; // Adjust the import path as needed
 
 const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => {
   const [formData, setFormData] = useState({
