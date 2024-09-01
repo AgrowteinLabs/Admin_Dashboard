@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MdAddCircle,
   MdEdit,
@@ -6,24 +6,24 @@ import {
   MdLocalFlorist,
 } from 'react-icons/md';
 import "./ProductManagement.scss";
-
-const initialProducts = [
-  { id: 1, name: "Agventure", description: "Advanced agricultural solutions for modern farming." },
-  { id: 2, name: "Hydroponics Automation", description: "Automated hydroponic systems for efficient growth." },
-  { id: 3, name: "Mushroom Farm Automation", description: "State-of-the-art automation for mushroom farming." },
-  { id: 4, name: "Green House Automation", description: "Control and monitor greenhouse environments efficiently." },
-  { id: 5, name: "Aquaponics Automation", description: "Integrated systems for aquaponics farming." },
-  { id: 6, name: "Smart Irrigation", description: "Smart systems for efficient water usage in agriculture." },
-  { id: 7, name: "Soil Monitoring", description: "Advanced soil monitoring systems for optimized farming." },
-  // Add more products as needed
-];
+import {Products, addProduct, deleteProduct, updateProduct} from '../../api/productsFetch'; // Assuming Products is a function that fetches product data
 
 const ProductManagement = () => {
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(6);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  useEffect(() => {
+    // Fetch the product data asynchronously when the component mounts
+    const fetchProducts = async () => {
+      const fetchedProducts = await Products(); // Assuming Products returns a promise with the data
+      setProducts(fetchedProducts);
+    };
+
+    fetchProducts();
+  }, []);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -33,15 +33,18 @@ const ProductManagement = () => {
   const handleAddProduct = (newProduct) => {
     setProducts([...products, { id: products.length + 1, ...newProduct }]);
     setIsAddingProduct(false);
+    addProduct(newProduct); // Assuming addProduct is a function that sends a POST request to the API
   };
 
   const handleEditProduct = (updatedProduct) => {
-    setProducts(products.map(product => product.id === updatedProduct.id ? updatedProduct : product));
+    setProducts(products.map(product => product._id === updatedProduct._id ? updatedProduct : product));
     setEditingProduct(null);
+    updateProduct(updatedProduct); // Assuming updateProduct is a function that sends a PUT request to the API
   };
 
   const handleDeleteProduct = (productId) => {
-    setProducts(products.filter(product => product.id !== productId));
+    setProducts(products.filter(product => product._id !== productId));
+    deleteProduct(productId); // Assuming deleteProduct is a function that sends a DELETE request to the API
   };
 
   const handlePageChange = (pageNumber) => {
@@ -79,7 +82,7 @@ const ProductManagement = () => {
       {!isAddingProduct && !editingProduct && (
         <div className="product-grid">
           {currentProducts.map((product) => (
-            <div key={product.id} className="product-card">
+            <div key={product._id} className="product-card">
               <div className="product-info">
                 <span className="product-icon">
                   <MdLocalFlorist size={48} />
@@ -92,7 +95,7 @@ const ProductManagement = () => {
                   <MdEdit size={20} />
                   Edit
                 </button>
-                <button className="delete-button" onClick={() => handleDeleteProduct(product.id)}>
+                <button className="delete-button" onClick={() => handleDeleteProduct(product._id)}>
                   <MdDelete size={20} />
                   Delete
                 </button>
@@ -117,6 +120,9 @@ const ProductForm = ({ product = {}, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     name: product.name || "",
     description: product.description || "",
+    userId: "66d32e8f5bc4567c833a0ba8",
+    modelNumber: product.modelNumber || "",
+    productType: product.productType || "",
   });
 
   const handleChange = (e) => {
@@ -133,7 +139,7 @@ const ProductForm = ({ product = {}, onSubmit, onCancel }) => {
 
   return (
     <div className="product-form">
-      <h2>{product.id ? "Edit Product" : "Add New Product"}</h2>
+      <h2>{product._id ? "Edit Product" : "Add New Product"}</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Name:</label>
@@ -150,6 +156,24 @@ const ProductForm = ({ product = {}, onSubmit, onCancel }) => {
           <textarea
             name="description"
             value={formData.description}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Serial Number:</label>
+          <input
+            name="modelNumber"
+            value={formData.modelNumber }
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Product Type:</label>
+          <input
+            name="productType"
+            value={formData.productType }
             onChange={handleChange}
             required
           />

@@ -196,3 +196,41 @@
     }
   }
 }
+
+.submit-button{
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+
+  &.active {
+    background-color: #02685c;
+  }
+
+  &:hover {
+    background-color: #02685c;
+  }
+}
+
+.cancel-button{
+  background-color: var(--red-color);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+
+  &.active {
+    background-color: #ff6868;
+  }
+
+  &:hover {
+    background-color: #7e0000;
+  }
+}

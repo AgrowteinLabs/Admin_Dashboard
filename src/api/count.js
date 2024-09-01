@@ -4,7 +4,9 @@ export default async function data(){
     const usersdata = await Users.json();
     const Sensors = await fetch('https://agrowteinlabs.onrender.com/api/v1/sensors');
     const sensorsdata = await Sensors.json();
-    return { usersdata, sensorsdata };
+    const usersno = usersdata.length;
+    const sensorsno = sensorsdata.length;
+    return { usersno, sensorsno };
 }
     catch(err){
         return err;

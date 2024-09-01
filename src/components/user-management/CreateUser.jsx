@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaUserPlus } from "react-icons/fa";
 import "../../components/dashboard/areaCharts/AreaCharts.scss";
 import { userCreation } from '../../api/userCreation'; // Adjust the import path as needed
+import "./userManagement.scss";
 
 const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => {
   const [formData, setFormData] = useState({
