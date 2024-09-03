@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import  { useContext } from 'react';
 import { UserContext } from '../../context/UserContext';
 import "./Profile.scss";
 import defaultProfileIcon from '../../assets/defaultProfileIcon.png'; // Path to the fixed profile icon

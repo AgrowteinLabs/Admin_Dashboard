@@ -16,6 +16,8 @@ import UserManagement from "./components/user-management/UserManagement";
 import ProductManagement from "./components/product-management/ProductManagement"; // Import the ProductManagement component
 import SensorManagement from "./components/sensor-management/SensorManagement"; // Import the SensorManagement component
 import ReportsManagement from "./components/reports/ReportsManagement"; // Import the ReportsManagement component
+import Login from './components/Login/login';
+import ProtectedRoute from './utils/ProtectedRoute';
 
 function App() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -33,8 +35,9 @@ function App() {
       <UserProvider>
         <Router>
           <Routes>
-            <Route element={<BaseLayout />}>
-              <Route path="/" element={<Dashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route element={<ProtectedRoute><BaseLayout /></ProtectedRoute>}>
+              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/user-management" element={<UserManagement />} />
               <Route path="/product-management" element={<ProductManagement />} /> 
               <Route path="/sensor-management" element={<SensorManagement />} />
