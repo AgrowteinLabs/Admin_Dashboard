@@ -19,7 +19,7 @@
   // transition
   --default-transition: all 300ms ease-in-out;
   // chart
-  --chart-primary-color: #03856d;
+  --chart-primary-color: #475be8;
   --chart-secondary-color: #e6e6e6;
   // box shadow
   --light-shadow1: rgba(0, 0, 0, 0.02) 0px 4px 12px;
@@ -47,13 +47,12 @@
   --tbl-border-color: #f2f4ff;
   --scroll-track-bg-color: #fff;
   --scroll-thumb-bg-color: #e9e9e9;
-  --input-border-color: #0000001e;
 }
 
 @mixin darkMode {
   --primary-color:#03856d;
-  --secondary-color: #191924;
-  --background-color: #1e1e2d;
+  --secondary-color: #2e2e48;
+  --background-color: #383854;
   --side-link-hover-color: #525270;
   --side-text-color: #e1e1e1;
   --logo-color: #fff;
@@ -71,8 +70,6 @@
   --tbl-border-color: ##383854;
   --scroll-track-bg-color: #2e2e48;
   --scroll-thumb-bg-color: #575777;
-  --input-border-color: #ffffff0d;
-
 }
 
 * {

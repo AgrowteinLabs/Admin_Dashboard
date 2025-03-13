@@ -11,6 +11,51 @@
     animation: fadeIn 1s ease-in-out;
   }
 
+  /* Search Bar */
+  .search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    input {
+      width: 300px;
+      padding: 10px;
+      border: 2px solid var(--primary-color);
+      border-radius: 5px 0 0 5px;
+      font-size: 1.1em;
+      outline: none;
+
+      &:focus {
+        border-color: #333;
+      }
+    }
+
+    .search-button {
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 0 5px 5px 0;
+      cursor: pointer;
+      font-size: 1.1em;
+
+      &:hover {
+        background-color: #02685c;
+      }
+    }
+  }
+
+  /* Success Message */
+  .success-message {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* User Actions */
   .user-actions {
     display: flex;
     justify-content: center;
@@ -28,18 +73,14 @@
       align-items: center;
       gap: 8px;
       font-size: 1.2em;
-      transition: background-color 0.3s ease-in-out;
 
       &:hover {
-        background-color: #02685c; /* Slightly darker shade of primary color */
-      }
-
-      svg {
-        margin-right: 8px;
+        background-color: #02685c;
       }
     }
   }
 
+  /* User Grid */
   .user-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -47,18 +88,11 @@
   }
 
   .user-card {
-    background-color: var(--secondary-color);
+    background-color: var(--card-background-color);
     border: 1px solid var(--border-color);
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     padding: 20px;
-
-    &:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
     .user-info {
       text-align: center;
@@ -66,13 +100,13 @@
 
       .user-icon {
         margin-bottom: 10px;
-        color: var(--primary-color);
+        color: var(--text-color);
       }
 
       h2 {
         font-size: 1.5em;
         margin-bottom: 10px;
-        color: var(--text-color);
+        color: var(--primary-color);
       }
 
       p {
@@ -80,14 +114,14 @@
         color: var(--text-color);
       }
     }
-
     .user-actions {
       display: flex;
       justify-content: center;
       gap: 10px;
 
-      .edit-button, .delete-button {
-        background-color: var(--primary-color);
+      /* Edit Button */
+      .edit-button {
+        background-color: #03856d;
         color: #fff;
         border: none;
         padding: 10px 20px;
@@ -95,20 +129,24 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 5px;
-        transition: background-color 0.3s ease-in-out;
+        gap: 8px;
 
         &:hover {
-          background-color: #02685c; /* Slightly darker shade of primary color */
-        }
-
-        svg {
-          margin-right: 5px;
+          background-color: #02685c;
         }
       }
 
+      /* Delete Button */
       .delete-button {
         background-color: #e74c3c;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
 
         &:hover {
           background-color: #c0392b;
@@ -117,197 +155,43 @@
     }
   }
 
-  .pagination-nav {
+  /* Pagination */
+  .pagination {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
-
-    .pagination {
-      list-style: none;
-      display: flex;
-      gap: 10px;
-
-      .page-item {
-        .page-link {
-          padding: 8px 12px;
-          border-radius: 5px;
-          border: 1px solid var(--border-color);
-          background-color: var(--button-bg-color);
-          color: var(--text-color);
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-
-          &:hover {
-            background-color: var(--button-hover-bg-color);
-          }
-        }
-
-        &.active .page-link {
-          background-color: var(--primary-color);
-          color: white;
-          border-color: var(--primary-color);
-        }
-      }
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-
-  button {
-    padding: 14px 24px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .submit-button {
-    background: linear-gradient(135deg, #43cea2, #185a9d); /* Gradient from a light teal to a dark blue */
-    color: white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    text-transform: uppercase; /* Make the text uppercase for emphasis */
-    transition: background 0.3s ease, transform 0.3s ease;
-
-    &:hover {
-      background: linear-gradient(135deg, #185a9d, #43cea2); /* Inverted gradient on hover */
-      box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-3px); /* Lift the button slightly */
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  .cancel-button {
-    background: linear-gradient(135deg, #ff6f61, #d63b3b); /* Gradient from a light red to a dark red */
-    color: white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-left: 10px;
-    text-transform: uppercase; /* Make the text uppercase for emphasis */
-    transition: background 0.3s ease, transform 0.3s ease;
-
-    &:hover {
-      background: linear-gradient(135deg, #d63b3b, #ff6f61); /* Inverted gradient on hover */
-      box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-3px); /* Lift the button slightly */
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-  }
-}
-
-// Specific Styles for CreateUser Component
-.create-user-card .form-group {
-  margin-bottom: 20px;
-
-  label {
-    font-weight: 700;
-    color: var(--text-color-inverted);
-    margin-bottom: 10px;
-    display: block;
-    font-size: 14px;
-    text-transform: uppercase;
-  }
-
-  input, select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid var(--input-border-color); /* Dynamic border color */
-    background-color: var(--input-bg-color);
-    color: var(--text-color-inverted); /* Input text color */
-    font-size: 16px;
-    box-shadow: var(--light-shadow1);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 10px var(--primary-color);
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
     margin-top: 20px;
 
     button {
-      padding: 14px 24px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .submit-button {
       background-color: var(--primary-color);
       color: #fff;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      margin: 0 5px;
+      cursor: pointer;
+
+      &.active {
+        background-color: #02685c;
+      }
 
       &:hover {
-        background-color: var(--primary-color-dark); /* Make sure this is defined */
-        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
+        background-color: #02685c;
       }
 
-      &:active {
-        transform: translateY(0);
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      }
-    }
-
-    .cancel-button {
-      background-color: #ccc;
-      color: #333;
-      margin-left: 10px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-
-      &:hover {
-        background-color: #bbb;
-        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-      }
-
-      &:active {
-        transform: translateY(0);
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
       }
     }
   }
 }
 
-
-.success-message {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  text-align: center;
+/* Animation for Fade-in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

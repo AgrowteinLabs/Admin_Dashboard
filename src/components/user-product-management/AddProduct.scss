@@ -1,0 +1,201 @@
+.add-product-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 16px;
+
+  label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 10px; // Ensure space between fields
+
+    &:focus {
+      border-color: #03856d;
+      outline: none;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.submit-button {
+  background-color: #03856d;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+
+  &:hover {
+    background-color: #02685c;
+  }
+}
+
+.cancel-button {
+  background-color: #e0e0e0;
+  color: #333;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+
+  &:hover {
+    background-color: #ccc;
+  }
+}
+
+.back-button {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1.1em;
+  margin-bottom: 20px;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-right: 8px;
+  }
+}
+
+/* Enhance the button look */
+.selected-sensors-list ul {
+  padding-left: 20px;
+}
+
+.selected-sensors-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.selected-sensors-list button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #c0392b;
+  }
+}
+
+.selected-sensors-list li button {
+  margin-left: 10px;
+}
+
+.remove-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-bottom: 10px;
+
+  &:hover {
+    background-color: #c0392b;
+  }
+}
+
+.control-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.control-entry label {
+  font-size: 14px;
+}
+
+.control-entry input {
+  font-size: 14px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.control-entry input[type="number"],
+.control-entry input[type="text"] {
+  width: 100%;
+}
+
+.control-entry input[type="checkbox"] {
+  margin-left: 10px;
+}
+
+.add-button {
+  background-color: #0d4f49;
+  color: whitesmoke;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #02685c;
+  }
+}

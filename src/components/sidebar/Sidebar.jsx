@@ -11,9 +11,10 @@ import {
   MdOutlineNotifications,
   MdOutlinePerson,
   MdOutlineQuestionAnswer,
-  MdOutlineShoppingBag,
+  MdGroupAdd,
   MdOutlineAssessment,
   MdMenu,
+  MdOutlineAddBusiness,
 } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.scss";
@@ -86,9 +87,17 @@ const Sidebar = () => {
               <li className="menu-item">
                 <NavLink to="/product-management" className={getNavLinkClassName}>
                   <span className="menu-link-icon">
-                    <MdOutlineShoppingBag size={20} />
+                  <MdOutlineAddBusiness size={20} />
                   </span>
                   <span className="menu-link-text">Product Management</span>
+                </NavLink>
+              </li>
+              <li className="menu-item">
+                <NavLink to="/user-product-management" className={getNavLinkClassName}>
+                  <span className="menu-link-icon">
+                  <MdGroupAdd size={20} />
+                  </span>
+                  <span className="menu-link-text">User's Product </span>
                 </NavLink>
               </li>
               <li className="menu-item">

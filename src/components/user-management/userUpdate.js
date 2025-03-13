@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const userUpdate = async (userId, userData) => {
   try {
-    const response = await axios.put(`https://agrowteinlabs.onrender.com/api/v1/users/${userId}`, userData, {
+    const response = await axios.put(`https://apiv2.agrowtein.com/api/v1/users/${userId}`, userData, {
       headers: {
         'Content-Type': 'application/json',
       },

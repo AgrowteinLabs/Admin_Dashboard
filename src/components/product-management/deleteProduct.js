@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const deleteProduct = async (productId) => {
   try {
-    const response = await axios.delete(`https://agrowteinlabs.onrender.com/api/v1/products/${productId}`, {
+    const response = await axios.delete(`https://apiv2.agrowtein.com/api/v1/products/${productId}`, {
       headers: {
         'Content-Type': 'application/json',
       },

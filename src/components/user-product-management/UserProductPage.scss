@@ -1,0 +1,133 @@
+.user-products-page {
+    padding: 30px;
+    background-color: #f4f7fa;
+    border-radius: 8px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+  }
+  
+  .product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .product-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  .product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .product-name {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #1a73e8;
+  }
+  
+  .edit-button {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+  }
+  
+  .edit-button:hover {
+    background-color: #135d8e;
+  }
+  
+  .product-description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 15px;
+  }
+  
+  .sensors-section {
+    margin-top: 20px;
+  }
+  
+  .sensors-section h4 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .sensor-item {
+    background-color: #f9f9f9;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    font-size: 1rem;
+  }
+  
+  .sensor-item p {
+    margin: 5px 0;
+  }
+  
+  .sensor-item strong {
+    color: #333;
+  }
+  
+  .sensor-item button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .sensor-item button:hover {
+    background-color: #d32f2f;
+  }
+  
+  .no-sensors {
+    font-size: 1.2rem;
+    color: #888;
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .product-list {
+      grid-template-columns: 1fr;
+    }
+  
+    .product-name {
+      font-size: 1.6rem;
+    }
+  
+    .product-description {
+      font-size: 0.9rem;
+    }
+  }
+  

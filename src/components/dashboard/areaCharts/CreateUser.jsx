@@ -1,62 +1,104 @@
-import React, { useState } from 'react';
-import { FaUserPlus } from "react-icons/fa";
-import "./AreaCharts";
-import { userCreation } from './userCreation'; // Adjust the import path as needed
+import React, { useState } from "react";
+import { FaUserPlus, FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./AreaCharts.scss";
+import { userCreation } from "../../../api/userCreation"; // Adjust the import path as needed
 
 const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => {
   const [formData, setFormData] = useState({
-    name: user.fullName || "",
+    name: user.name || "",
     email: user.email || "",
     password: user.password || "",
     phoneNumber: user.phoneNumber || "",
-    city: user.address?.city || "",
-    state: user.address?.state || "",
-    country: user.address?.country || "India", // Default country
-    postalCode: user.address?.postalCode || "",
-    role: user.role || "user", // Default role
-    termsAgreement: user.termsAgreement || false,
-    privacyPolicyAgreement: user.privacyPolicyAgreement || false,
+    city: user.city || "",
+    state: user.state || "",
+    country: user.country || "India", // Default country
+    postalCode: user.postalCode || "",
   });
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+
+  const initialFormState = {
+    name: "",
+    email: "",
+    password: "",
+    phoneNumber: "",
+    city: "",
+    state: "",
+    country: "India", // Default country
+    postalCode: "",
+  };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const userData = mapFormDataToUserData(formData);
-  
+
     try {
       const result = await userCreation(userData);
-      console.log('User created:', result); // Log success for debugging
-      onSubmit(result); // Pass the result to the onSubmit callback
+      toast.success("🎉 User created successfully!", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "colored",
+      });
+      setFormData(initialFormState); // Reset the form to the initial state
+      onSubmit(result);
     } catch (error) {
-      if (error.response) {
-        // Check for conflict (email already exists)
-        if (error.response.status === 409) {
-          alert('A user with this email already exists. Please use a different email.');
-        } else if (error.response.status === 400) {
-          // Handle bad request errors
-          alert('There was an issue with the provided data. Please check and try again.');
-        } else {
-          // Handle other error codes
-          alert('An unexpected error occurred. Please try again later.');
-        }
-        console.error('Error response:', error.response.data); // Log detailed error response
+      console.error("Error creating user:", error);
+
+      if (error.response && error.response.status === 409) {
+        const errorMessage =
+          error.response.data?.message || "User already exists!";
+        toast.error(`⚠️ ${errorMessage}`, {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+        });
+      } else if (error.response) {
+        toast.error(
+          `❌ Error: ${error.response.status} - ${error.response.statusText}`,
+          {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored",
+          }
+        );
       } else {
-        // Network or other errors
-        console.error('Error creating user:', error.message);
-        alert('An error occurred while creating the user. Please try again.');
+        toast.error("❌ An error occurred while creating the user.", {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "colored",
+        });
       }
     }
   };
-  
-  
-  
 
   const mapFormDataToUserData = (formData) => {
     return {
@@ -70,20 +112,18 @@ const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => 
       email: formData.email,
       phoneNumber: formData.phoneNumber,
       password: formData.password,
-      role: formData.role,
-      termsAgreement: formData.termsAgreement,
-      privacyPolicyAgreement: formData.privacyPolicyAgreement,
     };
   };
 
   return (
     <div className="card create-user-card">
+      <ToastContainer /> {/* Add this to display notifications */}
       <h4 className="card-title">
         <FaUserPlus />
         {user.id ? "Edit User" : "Create User"}
       </h4>
       <div className="card-content">
-        <form onSubmit={handleSubmit} className="scrollable-form">
+        <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Name:</label>
             <input
@@ -106,13 +146,28 @@ const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => 
           </div>
           <div className="form-group">
             <label>Password:</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required={!user.id} // Password required only when creating a new user
-            />
+            <div style={{ position: "relative" }}>
+              <input
+                type={showPassword ? "text" : "password"} // Switch between "text" and "password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required={!user.id} // Password required only when creating a new user
+                style={{ width: "100%", paddingRight: "40px" }} // Adjust padding for the eye icon
+              />
+              <span
+                onClick={togglePasswordVisibility}
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  cursor: "pointer",
+                }}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
           </div>
           <div className="form-group">
             <label>Phone Number:</label>
@@ -145,16 +200,6 @@ const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => 
             />
           </div>
           <div className="form-group">
-            <label>Country:</label>
-            <input
-              type="text"
-              name="country"
-              value={formData.country}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
             <label>Postal Code:</label>
             <input
               type="text"
@@ -163,42 +208,6 @@ const CreateUser = ({ user = {}, onSubmit = () => {}, onCancel = () => {} }) => 
               onChange={handleChange}
               required
             />
-          </div>
-          <div className="form-group">
-            <label>Role:</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              required
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div className="form-group checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                name="termsAgreement"
-                checked={formData.termsAgreement}
-                onChange={handleChange}
-                required
-              />
-              I agree to the terms of service
-            </label>
-          </div>
-          <div className="form-group checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                name="privacyPolicyAgreement"
-                checked={formData.privacyPolicyAgreement}
-                onChange={handleChange}
-                required
-              />
-              I agree to the privacy policy
-            </label>
           </div>
           <div className="form-actions">
             <button type="submit" className="submit-button">
