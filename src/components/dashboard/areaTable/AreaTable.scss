@@ -45,11 +45,7 @@
         padding: 14px 12px;
         @media (max-width: 768px) {
           font-size: 15px;
-<<<<<<< HEAD
-          padding: 12px 10px;
-=======
           padding: 12px 9px;
->>>>>>> d499f1d (Initial commit)
         }
       }
 
@@ -132,112 +128,6 @@
 }
 
 
-<<<<<<< HEAD
-.content-area-table {
-  background: var(--secondary-color);
-  border-radius: 5px;
-  box-shadow: var(--light-shadow1);
-  padding: 12px 16px;
-
-  .data-table-title {
-    font-size: 18px;
-    color: var(--xl-text-color);
-    margin-bottom: 12px;
-  }
-
-  .data-table-diagram {
-    border-radius: 6px;
-    border: 1px solid var(--tbl-border-color);
-    overflow-x: auto;
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      color: var(--text-color-inverted);
-
-      th,
-      td {
-        padding: 14px 12px;
-        text-align: left;
-      }
-
-      thead {
-        background-color: var(--thead-bg-color);
-      }
-
-      .dt-status-dot.dot-active {
-        background-color: green;
-      }
-
-      .dt-status-dot.dot-inactive {
-        background-color: red;
-      }
-
-      .dt-cell-action {
-        text-align: center;
-      }
-    }
-  }
-
-  .edit-user-form {
-    background: var(--form-background-color);
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: var(--medium-shadow1);
-    
-    h4 {
-      color: var(--text-color-inverted); /* Header color based on theme */
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-  
-    .form-group {
-      margin-bottom: 15px;
-  
-      label {
-        display: block;
-        font-weight: bold;
-        color: var(--text-color-inverted); /* Label color based on theme */
-      }
-  
-      input,
-      select {
-        width: 100%;
-        padding: 8px;
-        border-radius: 4px;
-        border: 1px solid var(--input-border-color); /* Dynamic border color */
-        background: var(--background-color); /* Input background color */
-        color: var(--text-color-inverted); /* Input text color */
-        transition: var(--default-transition);
-        box-shadow: var(--light-shadow1);
-      }
-    }
-  
-    .form-actions {
-      display: flex;
-      justify-content: space-between;
-  
-      .submit-button {
-        background-color: var(--primary-color);
-        color: #fff;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-  
-      .cancel-button {
-        background-color: #ccc;
-        color: #333;
-        padding: 10px 20px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-    }
-  }
-}
-=======
 .pagination {
   display: flex;
   justify-content: center;
@@ -263,4 +153,3 @@
     }
   }
 }
->>>>>>> d499f1d (Initial commit)
