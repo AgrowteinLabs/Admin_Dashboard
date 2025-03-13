@@ -45,7 +45,11 @@
         padding: 14px 12px;
         @media (max-width: 768px) {
           font-size: 15px;
+<<<<<<< HEAD
           padding: 12px 10px;
+=======
+          padding: 12px 9px;
+>>>>>>> d499f1d (Initial commit)
         }
       }
 
@@ -128,6 +132,7 @@
 }
 
 
+<<<<<<< HEAD
 .content-area-table {
   background: var(--secondary-color);
   border-radius: 5px;
@@ -232,3 +237,30 @@
     }
   }
 }
+=======
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+
+  button {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease-in-out;
+
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    &.active {
+      background-color: #02685c;
+    }
+  }
+}
+>>>>>>> d499f1d (Initial commit)

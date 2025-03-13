@@ -11,9 +11,16 @@ import {
   MdOutlineNotifications,
   MdOutlinePerson,
   MdOutlineQuestionAnswer,
+<<<<<<< HEAD
   MdOutlineShoppingBag,
   MdOutlineAssessment,
   MdMenu,
+=======
+  MdGroupAdd,
+  MdOutlineAssessment,
+  MdMenu,
+  MdOutlineAddBusiness,
+>>>>>>> d499f1d (Initial commit)
 } from "react-icons/md";
 import { NavLink } from "react-router-dom";
 import "./Sidebar.scss";
@@ -86,12 +93,27 @@ const Sidebar = () => {
               <li className="menu-item">
                 <NavLink to="/product-management" className={getNavLinkClassName}>
                   <span className="menu-link-icon">
+<<<<<<< HEAD
                     <MdOutlineShoppingBag size={20} />
+=======
+                  <MdOutlineAddBusiness size={20} />
+>>>>>>> d499f1d (Initial commit)
                   </span>
                   <span className="menu-link-text">Product Management</span>
                 </NavLink>
               </li>
               <li className="menu-item">
+<<<<<<< HEAD
+=======
+                <NavLink to="/user-product-management" className={getNavLinkClassName}>
+                  <span className="menu-link-icon">
+                  <MdGroupAdd size={20} />
+                  </span>
+                  <span className="menu-link-text">User's Product </span>
+                </NavLink>
+              </li>
+              <li className="menu-item">
+>>>>>>> d499f1d (Initial commit)
                 <NavLink to="/sensor-management" className={getNavLinkClassName}>
                   <span className="menu-link-icon">
                     <MdOutlineNotifications size={18} />

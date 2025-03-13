@@ -1,0 +1,110 @@
+.create-sensor-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .card-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  
+    label {
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+  
+      .input-icon {
+        margin-right: 8px;
+        color: #03856d;
+      }
+    }
+  
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+  
+    input:focus,
+    select:focus {
+      border-color: #03856d;
+      outline: none;
+    }
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+  
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
+  
+    .submit-button {
+      background-color: #03856d;
+      color: #fff;
+  
+      &:hover {
+        background-color: #0b473c;
+      }
+    }
+  
+    .cancel-button {
+      background-color: #e0e0e0;
+      color: #333;
+  
+      &:hover {
+        background-color: #ccc;
+      }
+    }
+  }
+  
+  
+  .back-button {
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+  
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  
+    display: flex;
+    align-items: center;
+  
+    svg {
+      margin-right: 8px;
+    }
+  }
+  

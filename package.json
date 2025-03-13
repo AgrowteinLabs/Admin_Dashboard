@@ -15,7 +15,11 @@
     "@mui/material": "^5.16.7",
     "apexcharts": "^3.51.0",
     "axios": "^1.7.3",
+<<<<<<< HEAD
     "date-fns": "^3.1.0",
+=======
+    "date-fns": "^3.6.0",
+>>>>>>> d499f1d (Initial commit)
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
     "react-apexcharts": "^1.4.1",
@@ -23,10 +27,21 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-leaflet": "^4.2.1",
+<<<<<<< HEAD
     "react-router-dom": "^6.21.1",
     "recharts": "^2.10.3",
     "sass": "^1.69.7",
     "sweetalert2": "^11.13.1"
+=======
+    "react-modal": "^3.16.1",
+    "react-router-dom": "^6.21.1",
+    "react-select": "^5.9.0",
+    "react-toastify": "^10.0.6",
+    "react-tooltip": "^5.28.0",
+    "recharts": "^2.10.3",
+    "sass": "^1.69.7",
+    "sweetalert2": "^11.14.2"
+>>>>>>> d499f1d (Initial commit)
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

@@ -26,14 +26,21 @@
     svg {
       margin-right: 12px;
       color: var(--primary-color);
+<<<<<<< HEAD
       animation: rotateIcon 2s linear infinite;
+=======
+>>>>>>> d499f1d (Initial commit)
     }
   }
 
   .card-content {
     font-size: 16px;
     color: var(--base-text-color);
+<<<<<<< HEAD
     line-height: 1.8;
+=======
+    line-height: 1.5;
+>>>>>>> d499f1d (Initial commit)
     max-height: 400px; /* Limit the height to make it scrollable */
     overflow-y: auto; /* Enable vertical scrolling */
   }
@@ -63,7 +70,11 @@
 
   input, select {
     width: 100%;
+<<<<<<< HEAD
     padding: 12px;
+=======
+    padding: 10px;
+>>>>>>> d499f1d (Initial commit)
     border-radius: 8px;
     border: 1px solid var(--border-color);
     background-color: var(--input-bg-color);
@@ -133,6 +144,7 @@
 // Layout for the entire content area
 .content-area-charts {
   display: grid;
+<<<<<<< HEAD
   grid-template-columns: 1fr 2fr;
   grid-template-rows: auto auto;
   gap: 24px;
@@ -147,4 +159,39 @@
   max-height: 300px;
   overflow-y: auto;
   padding-right: 10px; /* For padding right to avoid overlap with scrollbar */
+=======
+  grid-template-columns: 40% 60%; /* Set columns to 30% and 70% */
+  grid-template-rows: auto; /* Each row adjusts height automatically */
+  gap: 24px; /* Space between the charts */
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr; /* Stacks the charts in one column on smaller screens */
+  }
+}
+
+
+// Hide scrollbar but retain scroll functionality
+.scrollable-form {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px; /* To avoid content getting hidden under scrollbar */
+
+  /* Hide scrollbar for Webkit (Chrome, Edge, Safari) */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for Firefox */
+  scrollbar-width: none;
+
+  /* Hide scrollbar for Internet Explorer and Edge (legacy) */
+  -ms-overflow-style: none;
+}
+
+.map-wrapper {
+  height: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+>>>>>>> d499f1d (Initial commit)
 }
