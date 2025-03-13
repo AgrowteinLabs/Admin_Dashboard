@@ -1,7 +1,7 @@
 export default async function data() {
   try {
     const Users = await fetch(
-      "https://agrowteinlabs.onrender.com/api/v1/users",
+      "https://apiv2.agrowtein.com/api/v1/users",
       {
         method: "GET",
         headers: {
@@ -14,7 +14,7 @@ export default async function data() {
     const usersdata = await Users.json();
 
     const Sensors = await fetch(
-      "https://agrowteinlabs.onrender.com/api/v1/sensors",
+      "https://apiv2.agrowtein.com/api/v1/sensors",
       {
         method: "GET",
         headers: {

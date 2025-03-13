@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import  { useContext } from 'react';
-import { UserContext } from '../../context/UserContext';
-import "./Profile.scss";
-import defaultProfileIcon from '../../assets/defaultProfileIcon.png'; // Path to the fixed profile icon
-
-const Profile = () => {
-  const { user } = useContext(UserContext);
-
-  if (!user) {
-    return <div>Loading...</div>; // Show a loading state while user data is being fetched
-=======
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext } from '../../context/UserContext';
 import "./Profile.scss";
@@ -52,7 +40,6 @@ const Profile = () => {
         <CircularProgress />
       </div>
     );
->>>>>>> d499f1d (Initial commit)
   }
 
   return (
@@ -63,32 +50,14 @@ const Profile = () => {
           alt="Profile"
           className="profile-picture"
         />
-<<<<<<< HEAD
-        <h1 className="profile-name">{user.name}</h1>
-        <p className="profile-bio">{user.bio}</p>
-=======
         <h1 className="profile-name">{userData.fullName}</h1>
         <p className="profile-bio">
             {`${userData.address.city}, ${userData.address.state}, ${userData.address.country} - ${userData.address.postalCode}`}
           </p>
->>>>>>> d499f1d (Initial commit)
       </div>
       <div className="profile-content">
         <div className="profile-card">
           <h2>Contact Information</h2>
-<<<<<<< HEAD
-          <p>Email: {user.email}</p>
-          <p>Phone: {user.phone}</p>
-        </div>
-        <div className="profile-card">
-          <h2>Personal Details</h2>
-          <p>Location: {user.location}</p>
-          <p>Joined: {user.joined}</p>
-        </div>
-        <div className="profile-card">
-          <h2>Interests</h2>
-          <p>{user.interests.join(', ')}</p>
-=======
           <p>Email: {userData.email}</p>
           <p>Phone: {userData.phoneNumber}</p>
         </div>
@@ -100,7 +69,6 @@ const Profile = () => {
         <div className="profile-card">
           <h2>Interests</h2>
           <p>{user.interests ? user.interests.join(', ') : "No interests listed"}</p>
->>>>>>> d499f1d (Initial commit)
         </div>
       </div>
     </div>

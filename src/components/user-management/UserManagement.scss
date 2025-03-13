@@ -11,8 +11,6 @@
     animation: fadeIn 1s ease-in-out;
   }
 
-<<<<<<< HEAD
-=======
   /* Search Bar */
   .search-bar {
     display: flex;
@@ -58,7 +56,6 @@
   }
 
   /* User Actions */
->>>>>>> d499f1d (Initial commit)
   .user-actions {
     display: flex;
     justify-content: center;
@@ -76,28 +73,14 @@
       align-items: center;
       gap: 8px;
       font-size: 1.2em;
-<<<<<<< HEAD
-      transition: background-color 0.3s ease-in-out;
-
-      &:hover {
-        background-color: #02685c; /* Slightly darker shade of primary color */
-      }
-
-      svg {
-        margin-right: 8px;
-=======
 
       &:hover {
         background-color: #02685c;
->>>>>>> d499f1d (Initial commit)
       }
     }
   }
 
-<<<<<<< HEAD
-=======
   /* User Grid */
->>>>>>> d499f1d (Initial commit)
   .user-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -105,26 +88,11 @@
   }
 
   .user-card {
-<<<<<<< HEAD
-    background-color: var(--secondary-color);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    padding: 20px;
-
-    &:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    }
-=======
     background-color: var(--card-background-color);
     border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
->>>>>>> d499f1d (Initial commit)
 
     .user-info {
       text-align: center;
@@ -132,21 +100,13 @@
 
       .user-icon {
         margin-bottom: 10px;
-<<<<<<< HEAD
-        color: var(--primary-color);
-=======
         color: var(--text-color);
->>>>>>> d499f1d (Initial commit)
       }
 
       h2 {
         font-size: 1.5em;
         margin-bottom: 10px;
-<<<<<<< HEAD
-        color: var(--text-color);
-=======
         color: var(--primary-color);
->>>>>>> d499f1d (Initial commit)
       }
 
       p {
@@ -154,23 +114,14 @@
         color: var(--text-color);
       }
     }
-<<<<<<< HEAD
-
-=======
->>>>>>> d499f1d (Initial commit)
     .user-actions {
       display: flex;
       justify-content: center;
       gap: 10px;
 
-<<<<<<< HEAD
-      .edit-button, .delete-button {
-        background-color: var(--primary-color);
-=======
       /* Edit Button */
       .edit-button {
         background-color: #03856d;
->>>>>>> d499f1d (Initial commit)
         color: #fff;
         border: none;
         padding: 10px 20px;
@@ -178,22 +129,6 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-<<<<<<< HEAD
-        gap: 5px;
-        transition: background-color 0.3s ease-in-out;
-
-        &:hover {
-          background-color: #02685c; /* Slightly darker shade of primary color */
-        }
-
-        svg {
-          margin-right: 5px;
-        }
-      }
-
-      .delete-button {
-        background-color: #e74c3c;
-=======
         gap: 8px;
 
         &:hover {
@@ -212,7 +147,6 @@
         display: flex;
         align-items: center;
         gap: 8px;
->>>>>>> d499f1d (Initial commit)
 
         &:hover {
           background-color: #c0392b;
@@ -221,192 +155,12 @@
     }
   }
 
-<<<<<<< HEAD
-  .pagination-nav {
-=======
   /* Pagination */
   .pagination {
->>>>>>> d499f1d (Initial commit)
     display: flex;
     justify-content: center;
     margin-top: 20px;
 
-<<<<<<< HEAD
-    .pagination {
-      list-style: none;
-      display: flex;
-      gap: 10px;
-
-      .page-item {
-        .page-link {
-          padding: 8px 12px;
-          border-radius: 5px;
-          border: 1px solid var(--border-color);
-          background-color: var(--button-bg-color);
-          color: var(--text-color);
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-
-          &:hover {
-            background-color: var(--button-hover-bg-color);
-          }
-        }
-
-        &.active .page-link {
-          background-color: var(--primary-color);
-          color: white;
-          border-color: var(--primary-color);
-        }
-      }
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-
-.form-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-
-  button {
-    padding: 14px 24px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .submit-button {
-    background: linear-gradient(135deg, #43cea2, #185a9d); /* Gradient from a light teal to a dark blue */
-    color: white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    text-transform: uppercase; /* Make the text uppercase for emphasis */
-    transition: background 0.3s ease, transform 0.3s ease;
-
-    &:hover {
-      background: linear-gradient(135deg, #185a9d, #43cea2); /* Inverted gradient on hover */
-      box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-3px); /* Lift the button slightly */
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  .cancel-button {
-    background: linear-gradient(135deg, #ff6f61, #d63b3b); /* Gradient from a light red to a dark red */
-    color: white;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    margin-left: 10px;
-    text-transform: uppercase; /* Make the text uppercase for emphasis */
-    transition: background 0.3s ease, transform 0.3s ease;
-
-    &:hover {
-      background: linear-gradient(135deg, #d63b3b, #ff6f61); /* Inverted gradient on hover */
-      box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-3px); /* Lift the button slightly */
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    }
-  }
-}
-
-// Specific Styles for CreateUser Component
-.create-user-card .form-group {
-  margin-bottom: 20px;
-
-  label {
-    font-weight: 700;
-    color: var(--text-color-inverted);
-    margin-bottom: 10px;
-    display: block;
-    font-size: 14px;
-    text-transform: uppercase;
-  }
-
-  input, select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid var(--input-border-color); /* Dynamic border color */
-    background-color: var(--input-bg-color);
-    color: var(--text-color-inverted); /* Input text color */
-    font-size: 16px;
-    box-shadow: var(--light-shadow1);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-    &:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 10px var(--primary-color);
-    }
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-
-    button {
-      padding: 14px 24px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .submit-button {
-      background-color: var(--primary-color);
-      color: #fff;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-
-      &:hover {
-        background-color: var(--primary-color-dark); /* Make sure this is defined */
-        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-      }
-
-      &:active {
-        transform: translateY(0);
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      }
-    }
-
-    .cancel-button {
-      background-color: #ccc;
-      color: #333;
-      margin-left: 10px;
-      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-
-      &:hover {
-        background-color: #bbb;
-        box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-      }
-
-      &:active {
-        transform: translateY(0);
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-=======
     button {
       background-color: var(--primary-color);
       color: #fff;
@@ -427,23 +181,11 @@
       &:disabled {
         background-color: #ccc;
         cursor: not-allowed;
->>>>>>> d499f1d (Initial commit)
       }
     }
   }
 }
 
-<<<<<<< HEAD
-
-.success-message {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  text-align: center;
-=======
 /* Animation for Fade-in */
 @keyframes fadeIn {
   from {
@@ -452,5 +194,4 @@
   to {
     opacity: 1;
   }
->>>>>>> d499f1d (Initial commit)
 }

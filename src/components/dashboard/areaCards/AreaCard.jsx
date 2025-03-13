@@ -1,11 +1,7 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { FiUsers, FiServer, FiCalendar } from "react-icons/fi";
-<<<<<<< HEAD
-import data from "./apifetch";
-=======
 import data from "../../../api/count";
->>>>>>> d499f1d (Initial commit)
 import { CircularProgress } from "@mui/material";
 
 const AreaCard = ({ colors, cardInfo, type }) => {
@@ -16,15 +12,9 @@ const AreaCard = ({ colors, cardInfo, type }) => {
   useEffect(() => {
     // Fetch the data when the component mounts
     const fetchData = async () => {
-<<<<<<< HEAD
-      const { usersdata, sensorsdata } = await data();
-      setUserCount(usersdata.length);
-      setSensorCount(sensorsdata.length);
-=======
       const { usersno, sensorsno } = await data();
       setUserCount(usersno);
       setSensorCount(sensorsno);
->>>>>>> d499f1d (Initial commit)
     };
 
     fetchData();

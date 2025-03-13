@@ -3,7 +3,7 @@ import axios from 'axios';
 const productCreation = async (productData) => {
   try {
     console.log('Sending product data:', productData); // Debugging line
-    const response = await axios.post('https://agrowteinlabs.onrender.com/api/v1/products', productData, {
+    const response = await axios.post('https://apiv2.agrowtein.com/api/v1/products', productData, {
       headers: {
         'Content-Type': 'application/json',
       },

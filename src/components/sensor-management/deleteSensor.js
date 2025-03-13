@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const deleteSensor = async (sensorId) => {
   try {
-    const response = await axios.delete(`https://agrowteinlabs.onrender.com/api/v1/sensors/${sensorId}`, {
+    const response = await axios.delete(`https://apiv2.agrowtein.com/api/v1/sensors/${sensorId}`, {
       headers: {
         'Content-Type': 'application/json',
       },
