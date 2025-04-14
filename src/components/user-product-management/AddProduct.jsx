@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaPlusCircle } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
@@ -12,6 +12,7 @@ import {
   updateUserProduct,
 } from "../../api/userProductsFetch"; // Import the update API function
 import "./AddProduct.scss";
+import PropTypes from "prop-types";
 
 const AddProduct = ({
   product = {},
@@ -101,16 +102,17 @@ const AddProduct = ({
 
   const addSensor = (selectedSensor) => {
     if (selectedSensor) {
-      // Ensure we're passing the sensorId in the correct format
+      // Add only the sensorId (without the state)
       setFormData((prevData) => ({
         ...prevData,
         sensors: [
           ...prevData.sensors,
-          { sensorId: selectedSensor.value },  // Just pass sensorId here, no need for `state` initially
+          { sensorId: selectedSensor.value },  // Only add the sensorId here
         ],
       }));
     }
   };
+  
   
   
 
@@ -160,29 +162,42 @@ const AddProduct = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Ensure the installationDate is formatted correctly (yyyy-MM-dd)
+    
+    // Format the installation date to match the expected format
     const formattedData = {
       ...formData,
       installationDate: format(new Date(formData.installationDate), "yyyy-MM-dd"),
+    };
+  
+    // Only include the sensor IDs (no state)
+    const sensorsOnlyIds = formattedData.sensors.map(sensor => sensor.sensorId);  // Only extract sensorId
+  
+    // Prepare the payload for updating the product
+    const updateData = {
+      productId: formattedData.productId,  // Product ID (_id of the product)
+      alias: formattedData.alias,
+      location: formattedData.location,
+      sensors: sensorsOnlyIds,  // Only send sensor IDs, no state
+      controls: formattedData.controls,  // Controls remain the same
     };
   
     try {
       let result;
       if (formattedData.uid) {
         console.log("Updating product with UID:", formattedData.uid);
-        // Send the data to update user product
-        result = await updateUserProduct(formattedData.uid, formattedData);  // Send the formatted data correctly
+        // Send the update request
+        result = await updateUserProduct(formattedData.uid, updateData);  // Send the updated data
       } else {
-        result = await createUserProduct(formattedData);  // Create new product if no existing product
+        result = await createUserProduct(updateData);  // Create new product if no UID
       }
   
-      onSubmit(result); // Pass the result back to the parent component
-      navigate("/user-product-management?productAdded=true"); // Navigate after form submission
+      onSubmit(result);  // Return the result to the parent component
+      navigate("/user-product-management?productAdded=true");  // Navigate after form submission
     } catch (error) {
       console.error("Error submitting form:", error);
     }
   };
+  
   
   
   
@@ -294,30 +309,35 @@ const AddProduct = ({
 
             {/* Sensor Data Section */}
             <div className="form-group">
-  <label>Sensors Used:</label>
-  <Select
-    name="sensor"
-    loadOptions={loadSensors}
-    onChange={addSensor}
-    isSearchable
-    placeholder="Select a Sensor"
-  />
-  <div className="selected-sensors-list">
-    <ul>
-      {formData.sensors.map((sensor, index) => (
-        <li key={index}>
-          {/* Extract and render specific properties of the sensorId object */}
-          <p><strong>Sensor:</strong> {sensor.sensorId.name}</p>
-          <p><strong>Description:</strong> {sensor.sensorId.description}</p>
-          <button type="button" onClick={() => removeSensor(index)}>
-            Remove
-          </button>
-        </li>
-      ))}
-    </ul>
-  </div>
-</div>
-
+              <label>Sensors Used:</label>
+              <Select
+                name="sensor"
+                loadOptions={loadSensors}
+                onChange={addSensor}
+                isSearchable
+                placeholder="Select a Sensor"
+              />
+              <div className="selected-sensors-list">
+                <ul>
+                  {formData.sensors.map((sensor, index) => (
+                    <li key={index}>
+                      {/* Safely access sensorId properties */}
+                      <p>
+                        <strong>Sensor:</strong>{" "}
+                        {sensor.sensorId?.name || "Unknown Sensor"}
+                      </p>
+                      <p>
+                        <strong>Description:</strong>{" "}
+                        {sensor.sensorId?.description || "No description available"}
+                      </p>
+                      <button type="button" onClick={() => removeSensor(index)}>
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
 
             {/* Controls Section */}
             <div className="form-group">
@@ -451,6 +471,12 @@ const AddProduct = ({
       </div>
     </div>
   );
+};
+AddProduct.propTypes = {
+  product: PropTypes.object,
+  userId: PropTypes.string,
+  onSubmit: PropTypes.func,
+  onCancel: PropTypes.func,
 };
 
 export default AddProduct;

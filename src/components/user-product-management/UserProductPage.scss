@@ -62,6 +62,24 @@
     background-color: #135d8e;
   }
   
+  .delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    margin-left: 10px; /* Add spacing between buttons */
+  }
+  
+  .delete-button:hover {
+    background-color: #c0392b;
+  }
+  
   .product-description {
     font-size: 1rem;
     color: #555;
@@ -130,4 +148,3 @@
       font-size: 0.9rem;
     }
   }
-  
