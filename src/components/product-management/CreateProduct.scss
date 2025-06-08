@@ -111,3 +111,24 @@
     font-size: 1.2em; // Adjust size of the icon to match the text
   }
 }
+
+.message-box {
+  padding: 12px 20px;
+  margin: 10px 0;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+  animation: fadeIn 0.3s ease-in-out;
+
+  &.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 6px solid #28a745;
+  }
+
+  &.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 6px solid #dc3545;
+  }
+}
