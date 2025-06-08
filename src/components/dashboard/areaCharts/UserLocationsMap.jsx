@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
@@ -12,7 +12,7 @@ const UserLocationsMap = () => {
     const fetchUsersAndGeocode = async () => {
       try {
         // Step 1: Fetch all users from the backend
-        const usersResponse = await axios.get("https://agrowtein-5u7w.onrender.com/api/v1/users"); // Replace with your actual API endpoint
+        const usersResponse = await axios.get("https://apiv2.agrowtein.com/api/v1/users"); 
         const users = usersResponse.data;
 
         // Step 2: Geocode each user's city to get coordinates

@@ -1,150 +1,179 @@
 .user-products-page {
-    padding: 30px;
-    background-color: #f4f7fa;
-    border-radius: 8px;
-    font-family: 'Arial', sans-serif;
-  }
-  
+  padding: 30px;
+  background-color: #f4f7fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
   h1 {
     font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: #333;
+    color: var(--primary-color);
     text-align: center;
+    margin-bottom: 30px;
+    animation: fadeIn 0.8s ease-in;
   }
-  
-  .product-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
+}
+
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  animation: fadeInUp 0.6s ease-in;
+}
+
+.product-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
   }
-  
-  .product-card {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  }
-  
+
   .product-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+
+    .product-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 10px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.95rem;
+        padding: 8px 12px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        svg {
+          font-size: 1rem;
+        }
+      }
+
+      .edit-button {
+        background-color: var(--primary-color);
+        color: #fff;
+
+        &:hover {
+          background-color: #056352;
+        }
+      }
+
+      .delete-button {
+        background-color: #e74c3c;
+        color: white;
+
+        &:hover {
+          background-color: #c0392b;
+        }
+      }
+    }
   }
-  
-  .product-name {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #1a73e8;
-  }
-  
-  .edit-button {
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.2s ease;
-  }
-  
-  .edit-button:hover {
-    background-color: #135d8e;
-  }
-  
-  .delete-button {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.2s ease;
-    margin-left: 10px; /* Add spacing between buttons */
-  }
-  
-  .delete-button:hover {
-    background-color: #c0392b;
-  }
-  
+
   .product-description {
     font-size: 1rem;
     color: #555;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
   }
-  
+
+  p {
+    font-size: 0.95rem;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  strong {
+    font-weight: 600;
+    color: #222;
+  }
+
   .sensors-section {
     margin-top: 20px;
-  }
-  
-  .sensors-section h4 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  .sensor-item {
-    background-color: #f9f9f9;
-    border: 1px solid #eaeaea;
-    border-radius: 4px;
-    padding: 15px;
-    margin-bottom: 15px;
-    font-size: 1rem;
-  }
-  
-  .sensor-item p {
-    margin: 5px 0;
-  }
-  
-  .sensor-item strong {
-    color: #333;
-  }
-  
-  .sensor-item button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    font-size: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .sensor-item button:hover {
-    background-color: #d32f2f;
-  }
-  
-  .no-sensors {
-    font-size: 1.2rem;
-    color: #888;
-    text-align: center;
-  }
-  
-  @media (max-width: 768px) {
-    .product-list {
-      grid-template-columns: 1fr;
+
+    h4 {
+      font-size: 1.2rem;
+      font-weight: 500;
+      margin-bottom: 12px;
+      color: #1a1a1a;
     }
-  
-    .product-name {
-      font-size: 1.6rem;
-    }
-  
-    .product-description {
-      font-size: 0.9rem;
+
+    .sensor-item {
+      background-color: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+
+      p {
+        margin: 5px 0;
+      }
+
+      strong {
+        color: #333;
+      }
     }
   }
+}
+
+.no-sensors {
+  font-size: 1.1rem;
+  color: #888;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .product-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .product-actions {
+      margin-top: 10px;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .product-name {
+    font-size: 1.4rem;
+  }
+}

@@ -11,8 +11,10 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   transition: all 0.3s ease;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 .card:hover {
@@ -34,8 +36,7 @@
     font-weight: bold;
     color: #555;
     margin-bottom: 8px;
-    display: flex;
-    align-items: center;
+    display: block;
   }
 
   input,
@@ -46,7 +47,7 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
-    margin-bottom: 10px; // Ensure space between fields
+    margin-top: 5px;
 
     &:focus {
       border-color: #03856d;
@@ -59,16 +60,20 @@
   }
 }
 
-.submit-button {
-  background-color: #03856d;
-  color: white;
+.submit-button,
+.cancel-button {
   padding: 12px 20px;
   font-size: 16px;
   border-radius: 8px;
   border: none;
-  cursor: pointer;
   width: 100%;
   margin-top: 20px;
+  cursor: pointer;
+}
+
+.submit-button {
+  background-color: #03856d;
+  color: white;
 
   &:hover {
     background-color: #02685c;
@@ -78,13 +83,6 @@
 .cancel-button {
   background-color: #e0e0e0;
   color: #333;
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  margin-top: 20px;
 
   &:hover {
     background-color: #ccc;
@@ -100,61 +98,44 @@
   border-radius: 5px;
   font-size: 1.1em;
   margin-bottom: 20px;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
-
   display: flex;
   align-items: center;
 
   svg {
     margin-right: 8px;
   }
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
 }
 
-/* Enhance the button look */
 .selected-sensors-list ul {
   padding-left: 20px;
+  margin-top: 10px;
 }
 
 .selected-sensors-list li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
   margin-bottom: 10px;
-}
-
-.selected-sensors-list button {
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px;
-  cursor: pointer;
+  background: #f9f9f9;
+  padding: 8px 10px;
+  border-radius: 6px;
   font-size: 14px;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: #c0392b;
-  }
 }
 
-.selected-sensors-list li button {
-  margin-left: 10px;
-}
-
+.selected-sensors-list button,
 .remove-button {
   background-color: #e74c3c;
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 10px 10px;
+  padding: 6px 10px;
   font-size: 14px;
   cursor: pointer;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  transition: background-color 0.3s ease;
 
   &:hover {
     background-color: #c0392b;
@@ -162,29 +143,31 @@
 }
 
 .control-entry {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
 
-.control-entry label {
-  font-size: 14px;
-}
+  label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+  }
 
-.control-entry input {
-  font-size: 14px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-}
+  input[type="text"],
+  input[type="number"] {
+    font-size: 14px;
+    border: 1px solid #ccc;
+    padding: 8px;
+    border-radius: 5px;
+    margin-top: 4px;
+  }
 
-.control-entry input[type="number"],
-.control-entry input[type="text"] {
-  width: 100%;
-}
-
-.control-entry input[type="checkbox"] {
-  margin-left: 10px;
+  input[type="checkbox"] {
+    margin-left: 10px;
+    margin-top: 8px;
+    transform: scale(1.1);
+  }
 }
 
 .add-button {
@@ -194,8 +177,24 @@
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 10px;
 
   &:hover {
     background-color: #02685c;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-width: 95%;
+  }
+
+  .control-entry {
+    grid-template-columns: 1fr;
+  }
+
+  .submit-button,
+  .cancel-button {
+    font-size: 15px;
   }
 }
