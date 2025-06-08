@@ -1,232 +1,258 @@
-import React, { useState, useEffect } from 'react';
-import { MdAddCircle, MdEdit, MdDelete, MdLocalFlorist, MdArrowBack } from 'react-icons/md';
-import Swal from 'sweetalert2'; // Import SweetAlert2
-import ProductForm from './ProductForm';
-import './ProductManagement.scss';
-import { productsFetch, addProduct, deleteProduct, updateProduct } from '../../api/productsFetch';
+import { useState, useEffect } from "react";
+import {
+  MdAddCircle, MdEdit, MdDelete, MdLocalFlorist,
+} from "react-icons/md";
+import Swal from "sweetalert2";
+import ProductForm from "./ProductForm";
+import "./ProductManagement.scss";
+import {
+  productsFetch, addProduct, deleteProduct, updateProduct,
+} from "../../api/productsFetch";
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(6);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("name-asc");
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 6;
+
+
+  const fetchAllProducts = async () => {
+    try {
+      const data = await productsFetch();
+      setProducts(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error loading products:", err);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const fetchedProducts = await productsFetch(); // Fetch products
-        if (Array.isArray(fetchedProducts)) {
-          setProducts(fetchedProducts);
-          setFilteredProducts(fetchedProducts); // Initialize with all products
-        } else {
-          console.error('Fetched products is not an array', fetchedProducts);
-        }
-      } catch (error) {
-        console.error('Error fetching products', error);
-      }
-    };
-    fetchProducts();
+    fetchAllProducts();
   }, []);
 
-  // Filter products based on search term
-  useEffect(() => {
-    const filtered = products.filter(product =>
-      (product.name || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredProducts(filtered);
-  }, [searchTerm, products]);
-
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = Array.isArray(filteredProducts)
-    ? filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
-    : [];
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-
-  const handleAddProduct = async (newProduct) => {
-    try {
-      // Optimistically update the UI
-      setProducts([...products, newProduct]);
-      setSuccessMessage('Product added successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000); // Hide the message after 3 seconds
-
-      const addedProduct = await addProduct(newProduct); // Add product to backend
-      setProducts((prevProducts) => prevProducts.map((product) =>
-        product._id === newProduct._id ? addedProduct : product
-      ));
-      setIsAddingProduct(false); // Close the form
-    } catch (error) {
-      console.error('Error adding product:', error);
-      alert('Failed to add product. Please try again.');
-    }
-  };
-
-  const handleEditProduct = async (updatedProduct) => {
-    try {
-      // Optimistically update the UI
-      setProducts(products.map((product) =>
-        product._id === updatedProduct._id ? updatedProduct : product
-      ));
-      setSuccessMessage('Product updated successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000); // Hide the message after 3 seconds
-
-      const updatedProductResponse = await updateProduct(updatedProduct); // Update product in backend
-      setProducts(products.map((product) =>
-        product._id === updatedProductResponse._id ? updatedProductResponse : product
-      ));
-      setEditingProduct(null); // Clear editing state
-    } catch (error) {
-      console.error('Error updating product:', error);
-      alert('Failed to update product. Please try again.');
-    }
-  };
-
-  const handleDeleteProduct = (productId) => {
+  const toast = (icon, title) => {
     Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        deleteProduct(productId); // Delete product from backend
-        setProducts(products.filter(product => product._id !== productId));
-        setSuccessMessage('Product deleted successfully!');
-        setTimeout(() => setSuccessMessage(''), 3000); // Hide the message after 3 seconds
-        Swal.fire('Deleted!', 'Your product has been deleted.', 'success');
-      }
+      toast: true,
+      position: 'bottom-end',
+      icon,
+      title,
+      showConfirmButton: false,
+      timer: 2500,
+      timerProgressBar: true,
     });
   };
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+ const handleAddProduct = async (newProduct) => {
+  try {
+    await addProduct(newProduct); // ✅ no need to do .json() here
+    setIsAddingProduct(false);
+    fetchAllProducts();
+    toast("success", "Product added successfully");
+  } catch (error) {
+    console.error("Add failed:", error);
+    toast("error", error.message || "Failed to add product.");
+  }
+};
+
+
+
+  const handleEditProduct = async (updatedProduct) => {
+    try {
+      await updateProduct(updatedProduct);
+      setEditingProduct(null);
+      fetchAllProducts();
+      toast("success", "Product updated successfully");
+    } catch (error) {
+      console.error("Edit failed:", error);
+      toast("error", "Failed to update product");
+    }
   };
 
-  const handleCancel = () => {
-    setIsAddingProduct(false);
-    setEditingProduct(null);
+  const handleDeleteProduct = async (productId) => {
+    const product = products.find(p => p._id === productId);
+
+    const confirm = await Swal.fire({
+      title: `Delete "${product.name}"?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+    });
+
+    if (confirm.isConfirmed) {
+      let undo = false;
+      const undoToast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: true,
+        confirmButtonText: 'Undo',
+        showCancelButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+
+      const toastInstance = await undoToast.fire({
+        icon: 'info',
+        title: `"${product.name}" deleted.`,
+        text: "Undo within 5 seconds.",
+      });
+
+      if (toastInstance.isConfirmed) {
+        undo = true;
+        toast("info", "Deletion undone");
+      }
+
+      if (!undo) {
+        await deleteProduct(productId);
+        fetchAllProducts();
+        toast("success", "Product deleted");
+      }
+    }
   };
+
+  const handleBulkDelete = async () => {
+    const confirm = await Swal.fire({
+      title: "Delete selected products?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete all",
+    });
+
+    if (confirm.isConfirmed) {
+      await Promise.all(selectedIds.map(id => deleteProduct(id)));
+      setSelectedIds([]);
+      fetchAllProducts();
+      toast("success", "Selected products deleted");
+    }
+  };
+
+  const handleCheckboxChange = (productId) => {
+    setSelectedIds(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  };
+
+  const handleSortChange = (e) => setSortOrder(e.target.value);
+
+  const getFilteredSortedProducts = () => {
+  let list = [...products];
+
+  if (searchTerm) {
+    list = list.filter((p) =>
+      (p.name || "").toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+
+  if (sortOrder === "name-asc") {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOrder === "name-desc") {
+    list.sort((a, b) => b.name.localeCompare(a.name));
+  } else if (sortOrder === "created-desc") {
+    list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
+  const start = (currentPage - 1) * itemsPerPage;
+  return list.slice(start, start + itemsPerPage);
+};
+
 
   return (
     <div className="product-management-page">
       <h1>Product Management</h1>
 
-      {/* Search Bar */}
       {!isAddingProduct && !editingProduct && (
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <button className="search-button">Search</button>
-        </div>
-      )}
+        <>
+          <div className="toolbar">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <select onChange={handleSortChange} value={sortOrder}>
+              <option value="name-asc">Name (A → Z)</option>
+              <option value="name-desc">Name (Z → A)</option>
+              <option value="created-desc">Newest</option>
+            </select>
+            <button onClick={() => setIsAddingProduct(true)}>
+              <MdAddCircle size={20} /> Add Product
+            </button>
+            {selectedIds.length > 0 && (
+              <button className="delete-button" onClick={handleBulkDelete}>
+                Delete Selected ({selectedIds.length})
+              </button>
+            )}
+          </div>
 
-      {successMessage && <div className="success-message">{successMessage}</div>}
+          <div className="product-grid">
+            {getFilteredSortedProducts().map((product) => (
+              <div key={product._id} className="product-card">
+                <div className="product-header">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(product._id)}
+                    onChange={() => handleCheckboxChange(product._id)}
+                  />
+                </div>
+                <div className="product-info">
+                  <MdLocalFlorist size={40} />
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+                </div>
+                <div className="product-actions">
+                  <button onClick={() => setEditingProduct(product)}>
+                    <MdEdit /> Edit
+                  </button>
+                  <button
+                    className="delete-button"
+                    onClick={() => handleDeleteProduct(product._id)}
+                  >
+                    <MdDelete /> Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="pagination">
+  {Array.from({ length: Math.ceil(products.length / itemsPerPage) }, (_, i) => (
+    <button
+      key={i}
+      className={`page-button ${currentPage === i + 1 ? "active" : ""}`}
+      onClick={() => setCurrentPage(i + 1)}
+    >
+      {i + 1}
+    </button>
+  ))}
+</div>
 
-      {!isAddingProduct && !editingProduct && (
-        <div className="product-actions">
-          <button className="action-button" onClick={() => setIsAddingProduct(true)}>
-            <MdAddCircle size={24} />
-            Add New Product
-          </button>
-        </div>
+        </>
       )}
 
       {isAddingProduct && (
         <ProductForm
           onSubmit={handleAddProduct}
-          onCancel={handleCancel}
+          onCancel={() => setIsAddingProduct(false)}
+          product={{}}
+          allProducts={products}
         />
       )}
 
       {editingProduct && (
         <ProductForm
-          product={editingProduct} 
+          product={editingProduct}
           onSubmit={handleEditProduct}
-          onCancel={handleCancel}
-        />
-      )}
-
-      {!isAddingProduct && !editingProduct && (
-        <div className="product-grid">
-          {currentProducts.map((product) => (
-            <div key={product._id} className="product-card">
-              <div className="product-info">
-                <span className="product-icon">
-                  <MdLocalFlorist size={48} />
-                </span>
-                <h2>{product.name}</h2>
-                <p>{product.description}</p>
-              </div>
-              <div className="product-actions">
-                <button className="edit-button" onClick={() => setEditingProduct(product)}>
-                  <MdEdit size={20} />
-                  Edit
-                </button>
-                <button className="delete-button" onClick={() => handleDeleteProduct(product._id)}>
-                  <MdDelete size={20} />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {!isAddingProduct && !editingProduct && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
+          onCancel={() => setEditingProduct(null)}
+          allProducts={products}
         />
       )}
     </div>
-  );
-};
 
-// Pagination component definition
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const pageNumbers = [];
-
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
-
-  return (
-    <div className="pagination">
-      <button
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        Prev
-      </button>
-      {pageNumbers.map((number) => (
-        <button
-          key={number}
-          className={number === currentPage ? 'active' : ''}
-          onClick={() => onPageChange(number)}
-        >
-          {number}
-        </button>
-      ))}
-      <button
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        Next
-      </button>
-    </div>
+    
   );
 };
 

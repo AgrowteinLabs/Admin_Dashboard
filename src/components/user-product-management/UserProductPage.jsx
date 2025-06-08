@@ -1,34 +1,41 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { userProductsFetch, deleteUserProduct } from "../../api/userProductsFetch";
+import {
+  userProductsFetch,
+  deleteUserProduct,
+} from "../../api/userProductsFetch";
 import "./UserProductPage.scss";
-import AddProduct from "./AddProduct"; // Import AddProduct component
+import AddProduct from "./AddProduct";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import Swal from "sweetalert2"; // Import SweetAlert2 for confirmation dialogs
+import Swal from "sweetalert2";
 
 const UserProductsPage = () => {
-  const { userId } = useParams(); // Get userId from URL params
+  const { userId } = useParams();
   const [userProducts, setUserProducts] = useState([]);
-  const [editingProduct, setEditingProduct] = useState(null); // Track the product being edited
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [deletedProduct, setDeletedProduct] = useState(null); // For undo
 
   useEffect(() => {
-    const fetchUserProducts = async () => {
-      try {
-        const products = await userProductsFetch(userId);
-        setUserProducts(products);
-      } catch (error) {
-        console.error("Error fetching user products:", error);
-      }
-    };
-    fetchUserProducts();
+    fetchProducts();
   }, [userId]);
 
+  const fetchProducts = async () => {
+    try {
+      const products = await userProductsFetch(userId);
+      setUserProducts(products);
+    } catch (error) {
+      console.error("Error fetching user products:", error);
+      Swal.fire("Error", "Failed to load products", "error");
+    }
+  };
+
   const handleEditProduct = (product) => {
-    setEditingProduct(product); // Set the product to edit
+    setEditingProduct(product);
   };
 
   const handleDeleteProduct = async (productId) => {
-    Swal.fire({
+    const productToDelete = userProducts.find((p) => p._id === productId);
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "This action cannot be undone!",
       icon: "warning",
@@ -36,88 +43,111 @@ const UserProductsPage = () => {
       confirmButtonColor: "#e74c3c",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await deleteUserProduct(productId); // Call the API to delete the product
-          setUserProducts(userProducts.filter((product) => product._id !== productId)); // Update the state
-          Swal.fire("Deleted!", "The product has been deleted.", "success");
-        } catch (error) {
-          console.error("Error deleting product:", error);
-          Swal.fire("Error!", "An error occurred while deleting the product.", "error");
-        }
-      }
     });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteUserProduct(productId);
+        setDeletedProduct(productToDelete); // store deleted
+        setUserProducts(userProducts.filter((p) => p._id !== productId));
+
+        const undo = await Swal.fire({
+          icon: "info",
+          title: "Deleted",
+          text: "You can undo this action for 10 seconds.",
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonText: "Undo",
+          timer: 10000,
+          timerProgressBar: true,
+        });
+
+        if (undo.isConfirmed && deletedProduct) {
+          // Recreate API call can be implemented here if backend supports it
+          await fetchProducts(); // Re-fetch as re-create isn't implemented
+          setDeletedProduct(null);
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        Swal.fire("Error", "Failed to delete the product", "error");
+      }
+    }
   };
 
   return (
     <div className="user-products-page">
       <h1>User Products</h1>
 
-      {/* Render Edit Form if there's a product to edit */}
       {editingProduct ? (
         <AddProduct
           product={editingProduct}
-          onCancel={() => setEditingProduct(null)} // Close the form without saving
+          onCancel={() => setEditingProduct(null)}
           onSubmit={(updatedProduct) => {
-            // Handle the submit for updated product data
-            const updatedProducts = userProducts.map((product) =>
+            const updatedList = userProducts.map((product) =>
               product._id === updatedProduct._id ? updatedProduct : product
             );
-            setUserProducts(updatedProducts);
-            setEditingProduct(null); // Close the edit form
+            setUserProducts(updatedList);
+            setEditingProduct(null);
+            Swal.fire("Updated", "Product updated successfully", "success");
           }}
         />
       ) : (
         <div className="product-list">
-          {userProducts.map((product) => (
-            <div key={product._id} className="product-card">
-              <div className="product-header">
-                <h3 className="product-name">{product.alias || "No Alias"}</h3> {/* Display alias name */}
-                <div className="product-actions">
-                  <button
-                    onClick={() => handleEditProduct(product)}
-                    className="edit-button"
-                  >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product._id)}
-                    className="delete-button"
-                  >
-                    <FaTrash /> Delete
-                  </button>
+          {userProducts.length === 0 ? (
+            <p className="no-sensors">No products assigned to this user.</p>
+          ) : (
+            userProducts.map((product) => (
+              <div key={product._id} className="product-card">
+                <div className="product-header">
+                  <h3 className="product-name">
+                    {product.alias || "Unnamed Product"}
+                  </h3>
+                  <div className="product-actions">
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="edit-button"
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="delete-button"
+                    >
+                      <FaTrash /> Delete
+                    </button>
+                  </div>
+                </div>
+                <p className="product-description">
+                  {product.productId?.description || "No description"}
+                </p>
+                <p>
+                  <strong>Location:</strong> {product.location || "Unknown"}
+                </p>
+                <p>
+                  <strong>Installation Date:</strong>{" "}
+                  {new Date(product.installationDate).toLocaleDateString()}
+                </p>
+
+                <div className="sensors-section">
+                  <h4>Sensors</h4>
+                  {product.sensors?.length > 0 ? (
+                    <ul>
+                      {product.sensors.map((sensor, index) => (
+                        <li key={index} className="sensor-item">
+                          <p>
+                            <strong>Sensor:</strong>{" "}
+                            {sensor.sensorId?.name || "Unknown Sensor"}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="no-sensors">No sensors available.</p>
+                  )}
                 </div>
               </div>
-              <p className="product-description">{product.productId.description}</p>
-              <p>
-                <strong>Location:</strong> {product.location}
-              </p>
-              <p>
-                <strong>Installation Date:</strong>{" "}
-                {new Date(product.installationDate).toLocaleDateString()}
-              </p>
-
-              {/* Sensors Section */}
-              <div className="sensors-section">
-                <h4>Sensors</h4>
-                {product.sensors.length > 0 ? (
-                  <ul>
-                    {product.sensors.map((sensor, index) => (
-                      <li key={index} className="sensor-item">
-                        <p>
-                          <strong>Sensor:</strong>{" "}
-                          {sensor.sensorId ? sensor.sensorId.name : "Unknown"}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No sensors available.</p>
-                )}
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       )}
     </div>

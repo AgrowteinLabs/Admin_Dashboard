@@ -4,15 +4,16 @@ import { FaArrowLeft, FaPlusCircle } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { format } from "date-fns";
 import Select from "react-select/async";
+import Swal from "sweetalert2";
+import PropTypes from "prop-types";
 import { usersFetch } from "../../api/userslistfetch";
 import { productsFetch } from "../../api/productsFetch";
 import { Sensors } from "../../api/sensorFetch";
 import {
   createUserProduct,
   updateUserProduct,
-} from "../../api/userProductsFetch"; // Import the update API function
+} from "../../api/userProductsFetch";
 import "./AddProduct.scss";
-import PropTypes from "prop-types";
 
 const AddProduct = ({
   product = {},
@@ -23,12 +24,13 @@ const AddProduct = ({
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     userId: product.userId || userId || "",
-    productId: product.productId || "", // Ensure productId is initialized to an empty string if not present
+    productId: product.productId || "",
     uid: product.uid || "",
     alias: product.alias || "",
+    type: product.type || "Farm", // Default to "Farm"
     location: product.location || "",
-    installationDate: product.installationDate || "", // Initialize as empty or with a date
-    sensors: product.sensors || [],  // No need for individual sensor arrays
+    installationDate: product.installationDate || "",
+    sensors: product.sensors || [],
     controls: product.controls || [],
   });
 
@@ -39,95 +41,87 @@ const AddProduct = ({
         productId: product.productId || "",
         uid: product.uid || "",
         alias: product.alias || "",
+        type: product.type || "Farm", // Default to "Farm"
         location: product.location || "",
         installationDate: product.installationDate || "",
-        sensors: product.sensors || [], // Use product.sensors as is
+        sensors: product.sensors || [],
         controls: product.controls || [],
       });
     }
   }, [product, userId]);
+
   const loadUsers = async (inputValue) => {
     try {
-      const fetchedData = await usersFetch();
-      const filteredUsers = fetchedData
+      const fetched = await usersFetch();
+      return fetched
         .filter(
           (user) =>
             user.role.toLowerCase() === "user" &&
             user.fullName.toLowerCase().includes(inputValue.toLowerCase())
         )
-        .map((user) => ({ value: user._id, label: user.fullName }));
-      return filteredUsers;
-    } catch (error) {
-      console.error("Error fetching users:", error);
+        .map((u) => ({ value: u._id, label: u.fullName }));
+    } catch (err) {
+      console.error("Users load error:", err);
       return [];
     }
   };
 
   const loadProducts = async (inputValue) => {
     try {
-      const fetchedData = await productsFetch();
-      const filteredProducts = fetchedData
-        .filter((product) =>
-          product.name.toLowerCase().includes(inputValue.toLowerCase())
+      const fetched = await productsFetch();
+      return fetched
+        .filter((p) =>
+          p.name.toLowerCase().includes(inputValue.toLowerCase())
         )
-        .map((product) => ({ value: product._id, label: product.name }));
-      return filteredProducts;
-    } catch (error) {
-      console.error("Error fetching products:", error);
+        .map((p) => ({ value: p._id, label: p.name }));
+    } catch (err) {
+      console.error("Products load error:", err);
       return [];
     }
   };
 
   const loadSensors = async (inputValue) => {
     try {
-      const fetchedData = await Sensors();
-      const filteredSensors = fetchedData
-        .filter((sensor) =>
-          sensor.name.toLowerCase().includes(inputValue.toLowerCase())
+      const fetched = await Sensors();
+      return fetched
+        .filter((s) =>
+          s.name.toLowerCase().includes(inputValue.toLowerCase())
         )
-        .map((sensor) => ({ value: sensor._id, label: sensor.name }));
-      return filteredSensors;
-    } catch (error) {
-      console.error("Error fetching sensors:", error);
+        .map((s) => ({ value: s._id, label: s.name }));
+    } catch (err) {
+      console.error("Sensors load error:", err);
       return [];
     }
   };
 
   const handleChange = (name, value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addSensor = (selectedSensor) => {
-    if (selectedSensor) {
-      // Add only the sensorId (without the state)
-      setFormData((prevData) => ({
-        ...prevData,
+  const addSensor = (sensorOption) => {
+    if (sensorOption) {
+      setFormData((prev) => ({
+        ...prev,
         sensors: [
-          ...prevData.sensors,
-          { sensorId: selectedSensor.value },  // Only add the sensorId here
+          ...prev.sensors,
+          { sensorId: sensorOption },
         ],
       }));
     }
   };
-  
-  
-  
 
   const removeSensor = (index) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      sensors: prevData.sensors.filter((_, i) => i !== index),
+    setFormData((prev) => ({
+      ...prev,
+      sensors: prev.sensors.filter((_, i) => i !== index),
     }));
   };
 
   const addControl = () => {
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       controls: [
-        ...prevData.controls,
+        ...prev.controls,
         {
           pin: "",
           controlId: "",
@@ -144,63 +138,68 @@ const AddProduct = ({
   };
 
   const handleControlChange = (index, field, value) => {
-    const updatedControls = [...formData.controls];
-    updatedControls[index][field] =
+    const updated = [...formData.controls];
+    updated[index][field] =
       field === "bypass" || field === "automate" ? !!value : value;
-    setFormData((prevData) => ({
-      ...prevData,
-      controls: updatedControls,
-    }));
+    setFormData((prev) => ({ ...prev, controls: updated }));
   };
 
   const removeControl = (index) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      controls: prevData.controls.filter((_, i) => i !== index),
+    setFormData((prev) => ({
+      ...prev,
+      controls: prev.controls.filter((_, i) => i !== index),
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Format the installation date to match the expected format
-    const formattedData = {
-      ...formData,
-      installationDate: format(new Date(formData.installationDate), "yyyy-MM-dd"),
-    };
-  
-    // Only include the sensor IDs (no state)
-    const sensorsOnlyIds = formattedData.sensors.map(sensor => sensor.sensorId);  // Only extract sensorId
-  
-    // Prepare the payload for updating the product
-    const updateData = {
-      productId: formattedData.productId,  // Product ID (_id of the product)
-      alias: formattedData.alias,
-      location: formattedData.location,
-      sensors: sensorsOnlyIds,  // Only send sensor IDs, no state
-      controls: formattedData.controls,  // Controls remain the same
-    };
-  
+
+    const isEditing = Boolean(product && product._id);
+
     try {
+      const formattedDate = format(new Date(formData.installationDate), "yyyy-MM-dd");
+
+      const sensorsFormatted = (formData.sensors || []).map(sensor => {
+        if (sensor?.sensorId?.value) {
+          return { sensorId: sensor.sensorId.value };
+        } else if (sensor?.sensorId && typeof sensor.sensorId === "string") {
+          return { sensorId: sensor.sensorId };
+        } else if (sensor?.value) {
+          return { sensorId: sensor.value };
+        } else if (typeof sensor === "string") {
+          return { sensorId: sensor };
+        }
+        return null;
+      }).filter(Boolean);
+
+      const payload = {
+        userId: formData.userId?.value || formData.userId,
+        productId: formData.productId?.value || formData.productId,
+        uid: formData.uid,
+        alias: formData.alias,
+        type: formData.type, // <-- Added type
+        location: formData.location,
+        installationDate: formattedDate,
+        sensors: sensorsFormatted,
+        controls: formData.controls,
+      };
+
       let result;
-      if (formattedData.uid) {
-        console.log("Updating product with UID:", formattedData.uid);
-        // Send the update request
-        result = await updateUserProduct(formattedData.uid, updateData);  // Send the updated data
+      if (isEditing) {
+        result = await updateUserProduct(formData.uid, payload);
       } else {
-        result = await createUserProduct(updateData);  // Create new product if no UID
+        result = await createUserProduct(payload);
       }
-  
-      onSubmit(result);  // Return the result to the parent component
-      navigate("/user-product-management?productAdded=true");  // Navigate after form submission
+
+      Swal.fire("✅ Success", result.message || "User product saved successfully", "success");
+      onSubmit(result);
+      navigate("/user-product-management?productSaved=true");
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error("❌ Submit error:", error);
+      Swal.fire("❌ Error", error?.response?.data?.message || "Failed to save user product", "error");
     }
   };
-  
-  
-  
-  
+
   return (
     <div className="add-product-container">
       <div className="card create-sensor-card">
@@ -215,73 +214,71 @@ const AddProduct = ({
 
         <div className="card-content">
           <form onSubmit={handleSubmit} className="scrollable-form">
-            {/* User ID Section with UID selection */}
             <div className="form-group">
               <label>User ID:</label>
               <Select
                 name="userId"
                 loadOptions={loadUsers}
-                value={
-                  formData.userId
-                    ? { value: formData.userId, label: formData.userId }
-                    : null
-                } // Ensure controlled component
-                onChange={(selectedOption) =>
-                  handleChange("userId", selectedOption)
-                }
+                value={formData.userId}
+                onChange={(opt) => handleChange("userId", opt)}
                 isSearchable
                 placeholder="Select a User"
                 required
               />
             </div>
 
-            {/* Product ID Section */}
             <div className="form-group">
               <label>Product ID:</label>
               <Select
                 name="productId"
                 loadOptions={loadProducts}
-                value={
-                  formData.productId
-                    ? {
-                        value: formData.productId,
-                        label: formData.productId.name,
-                      }
-                    : null
-                } // Ensure you're passing the correct properties
-                onChange={(selectedOption) =>
-                  handleChange("productId", selectedOption)
-                }
+                value={formData.productId}
+                onChange={(opt) => handleChange("productId", opt)}
                 isSearchable
                 placeholder="Select a Product"
                 required
               />
             </div>
 
-            {/* UID Field */}
             <div className="form-group">
               <label>UID:</label>
               <input
                 type="text"
                 name="uid"
                 value={formData.uid}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onChange={(e) =>
+                  handleChange(e.target.name, e.target.value)
+                }
                 placeholder="e.g., U123456"
                 required
               />
             </div>
 
-            {/* Alias, Location, Installation Date */}
             <div className="form-group">
               <label>Alias:</label>
               <input
                 type="text"
                 name="alias"
                 value={formData.alias}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onChange={(e) =>
+                  handleChange(e.target.name, e.target.value)
+                }
                 placeholder="Enter alias for the product"
                 required
               />
+            </div>
+
+            <div className="form-group">
+              <label>Type:</label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={e => handleChange("type", e.target.value)}
+                required
+              >
+                <option value="Farm">Farm</option>
+                <option value="Others">Others</option>
+              </select>
             </div>
 
             <div className="form-group">
@@ -290,8 +287,10 @@ const AddProduct = ({
                 type="text"
                 name="location"
                 value={formData.location}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
-                placeholder="Enter location of installation"
+                onChange={(e) =>
+                  handleChange(e.target.name, e.target.value)
+                }
+                placeholder="Enter location"
                 required
               />
             </div>
@@ -302,12 +301,13 @@ const AddProduct = ({
                 type="date"
                 name="installationDate"
                 value={formData.installationDate}
-                onChange={(e) => handleChange(e.target.name, e.target.value)}
+                onChange={(e) =>
+                  handleChange(e.target.name, e.target.value)
+                }
                 required
               />
             </div>
 
-            {/* Sensor Data Section */}
             <div className="form-group">
               <label>Sensors Used:</label>
               <Select
@@ -317,33 +317,22 @@ const AddProduct = ({
                 isSearchable
                 placeholder="Select a Sensor"
               />
-              <div className="selected-sensors-list">
-                <ul>
-                  {formData.sensors.map((sensor, index) => (
-                    <li key={index}>
-                      {/* Safely access sensorId properties */}
-                      <p>
-                        <strong>Sensor:</strong>{" "}
-                        {sensor.sensorId?.name || "Unknown Sensor"}
-                      </p>
-                      <p>
-                        <strong>Description:</strong>{" "}
-                        {sensor.sensorId?.description || "No description available"}
-                      </p>
-                      <button type="button" onClick={() => removeSensor(index)}>
-                        Remove
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul>
+                {formData.sensors.map((sensor, i) => (
+                  <li key={i}>
+                    {sensor.sensorId?.label || "Sensor"}
+                    <button type="button" onClick={() => removeSensor(i)}>
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Controls Section */}
             <div className="form-group">
               <label>Controls:</label>
               <Tooltip id="controls-help">
-                Configure control limits, bypass options, and automation.
+                Configure control limits, bypass, automation.
               </Tooltip>
               {formData.controls.map((control, index) => (
                 <div key={index} className="control-entry">
@@ -391,7 +380,6 @@ const AddProduct = ({
                       onChange={(e) =>
                         handleControlChange(index, "min", e.target.value)
                       }
-                      placeholder="Min value"
                       required
                     />
                   </label>
@@ -403,7 +391,6 @@ const AddProduct = ({
                       onChange={(e) =>
                         handleControlChange(index, "max", e.target.value)
                       }
-                      placeholder="Max value"
                       required
                     />
                   </label>
@@ -413,9 +400,12 @@ const AddProduct = ({
                       type="number"
                       value={control.threshHold}
                       onChange={(e) =>
-                        handleControlChange(index, "threshHold", e.target.value)
+                        handleControlChange(
+                          index,
+                          "threshHold",
+                          e.target.value
+                        )
                       }
-                      placeholder="Threshold"
                       required
                     />
                   </label>
@@ -441,22 +431,25 @@ const AddProduct = ({
                   </label>
                   <button
                     type="button"
-                    className="remove-button"
                     onClick={() => removeControl(index)}
+                    className="remove-button"
                   >
                     Remove
                   </button>
                 </div>
               ))}
-              <button type="button" className="add-button" onClick={addControl}>
+              <button
+                type="button"
+                onClick={addControl}
+                className="add-button"
+              >
                 Add Control
               </button>
             </div>
 
-            {/* Submit and Cancel Buttons */}
             <div className="form-actions">
               <button type="submit" className="submit-button">
-                {product.id ? "Update Product" : "Add Product"}
+                {product._id ? "Update Product" : "Add Product"}
               </button>
               <button
                 type="button"
@@ -472,6 +465,7 @@ const AddProduct = ({
     </div>
   );
 };
+
 AddProduct.propTypes = {
   product: PropTypes.object,
   userId: PropTypes.string,
