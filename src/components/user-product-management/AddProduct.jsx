@@ -277,7 +277,7 @@ const AddProduct = ({
                 required
               >
                 <option value="Farm">Farm</option>
-                <option value="">Other</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
