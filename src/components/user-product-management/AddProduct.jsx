@@ -18,8 +18,8 @@ import "./AddProduct.scss";
 const AddProduct = ({
   product = {},
   userId,
-  onSubmit = () => {},
-  onCancel = () => {},
+  onSubmit = () => { },
+  onCancel = () => { },
 }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -35,19 +35,75 @@ const AddProduct = ({
   });
 
   useEffect(() => {
-    if (product._id) {
-      setFormData({
-        userId: product.userId || userId || "",
-        productId: product.productId || "",
-        uid: product.uid || "",
-        alias: product.alias || "",
-        type: product.type || "Farm", // Default to "Farm"
-        location: product.location || "",
-        installationDate: product.installationDate || "",
-        sensors: product.sensors || [],
-        controls: product.controls || [],
-      });
-    }
+    const loadEditData = async () => {
+      if (product._id) {
+        try {
+          // Load users to get the selected user data
+          const users = await usersFetch();
+          const selectedUser = users.find(u => u._id === (product.userId?._id || product.userId));
+          const userOption = selectedUser ? { value: selectedUser._id, label: selectedUser.fullName } : null;
+
+          // Load products to get the selected product data
+          const products = await productsFetch();
+          const selectedProduct = products.find(p => p._id === (product.productId?._id || product.productId));
+          const productOption = selectedProduct ? { value: selectedProduct._id, label: selectedProduct.name } : null;
+
+          // Load all sensors to get names for existing sensors
+          const allSensors = await Sensors();
+
+          // Format sensors with proper structure
+          const formattedSensors = (product.sensors || []).map(sensor => {
+            const sensorId = sensor.sensorId?._id || sensor.sensorId || sensor;
+            const sensorData = allSensors.find(s => s._id === sensorId);
+            return {
+              sensorId: sensorData ? { value: sensorData._id, label: sensorData.name } : { value: sensorId, label: "Unknown Sensor" }
+            };
+          });
+
+          // Format installation date for input field (yyyy-MM-dd)
+          let formattedDate = product.installationDate || "";
+          if (formattedDate) {
+            try {
+              const dateObj = new Date(formattedDate);
+              formattedDate = dateObj.toISOString().split('T')[0];
+            } catch (e) {
+              console.error("Date format error:", e);
+            }
+          }
+
+          // Ensure controls have all required fields including offset
+          const formattedControls = (product.controls || []).map(control => ({
+            pin: control.pin || "",
+            controlId: control.controlId || "",
+            name: control.name || "",
+            min: control.min ?? 0,
+            max: control.max ?? 0,
+            threshHold: control.threshHold ?? 0,
+            offset: control.offset ?? 0,
+            bypass: control.bypass ?? false,
+            automate: control.automate ?? true,
+            state: control.state || "OFF",
+          }));
+
+          setFormData({
+            userId: userOption,
+            productId: productOption,
+            uid: product.uid || "",
+            alias: product.alias || "",
+            type: product.type || "Farm",
+            location: product.location || "",
+            installationDate: formattedDate,
+            sensors: formattedSensors,
+            controls: formattedControls,
+          });
+        } catch (error) {
+          console.error("Error loading edit data:", error);
+          Swal.fire("Error", "Failed to load product data for editing", "error");
+        }
+      }
+    };
+
+    loadEditData();
   }, [product, userId]);
 
   const loadUsers = async (inputValue) => {
@@ -129,6 +185,7 @@ const AddProduct = ({
           min: 0,
           max: 0,
           threshHold: 0,
+          offset: 0,
           bypass: false,
           automate: true,
           state: "OFF",
@@ -139,8 +196,29 @@ const AddProduct = ({
 
   const handleControlChange = (index, field, value) => {
     const updated = [...formData.controls];
-    updated[index][field] =
-      field === "bypass" || field === "automate" ? !!value : value;
+    if (field === "bypass" || field === "automate") {
+      updated[index][field] = !!value;
+    } else if (field === "min" || field === "max" || field === "threshHold" || field === "offset") {
+      updated[index][field] = Number(value);
+
+      // Auto-validate threshHold when min, max, or threshHold changes
+      if (field === "min" || field === "max" || field === "threshHold") {
+        const min = field === "min" ? Number(value) : updated[index].min;
+        const max = field === "max" ? Number(value) : updated[index].max;
+        const threshold = field === "threshHold" ? Number(value) : updated[index].threshHold;
+
+        // Clamp threshold to valid range if needed
+        if (min !== undefined && max !== undefined && threshold !== undefined) {
+          if (threshold < min) {
+            updated[index].threshHold = min;
+          } else if (threshold > max) {
+            updated[index].threshHold = max;
+          }
+        }
+      }
+    } else {
+      updated[index][field] = value;
+    }
     setFormData((prev) => ({ ...prev, controls: updated }));
   };
 
@@ -156,39 +234,88 @@ const AddProduct = ({
 
     const isEditing = Boolean(product && product._id);
 
+    // Validate controls before submission
+    const invalidControls = formData.controls.filter((control) => {
+      const min = Number(control.min);
+      const max = Number(control.max);
+      const threshold = Number(control.threshHold);
+
+      if (threshold < min || threshold > max) {
+        return true;
+      }
+      return false;
+    });
+
+    if (invalidControls.length > 0) {
+      Swal.fire(
+        "❌ Validation Error",
+        "ThreshHold must be between Min and Max values for all controls. Please check your control settings.",
+        "error"
+      );
+      return;
+    }
+
     try {
-      const formattedDate = format(new Date(formData.installationDate), "yyyy-MM-dd");
-
-      const sensorsFormatted = (formData.sensors || []).map(sensor => {
-        if (sensor?.sensorId?.value) {
-          return { sensorId: sensor.sensorId.value };
-        } else if (sensor?.sensorId && typeof sensor.sensorId === "string") {
-          return { sensorId: sensor.sensorId };
-        } else if (sensor?.value) {
-          return { sensorId: sensor.value };
-        } else if (typeof sensor === "string") {
-          return { sensorId: sensor };
-        }
-        return null;
-      }).filter(Boolean);
-
-      const payload = {
-        userId: formData.userId?.value || formData.userId,
-        productId: formData.productId?.value || formData.productId,
-        uid: formData.uid,
-        alias: formData.alias,
-        type: formData.type, // <-- Added type
-        location: formData.location,
-        installationDate: formattedDate,
-        sensors: sensorsFormatted,
-        controls: formData.controls,
-      };
-
       let result;
+
       if (isEditing) {
-        result = await updateUserProduct(formData.uid, payload);
+        // For updates, only send the fields that can be updated
+        const updatePayload = {
+          alias: formData.alias,
+          location: formData.location,
+          type: formData.type,
+          controls: formData.controls.map(control => ({
+            pin: control.pin,
+            controlId: control.controlId,
+            name: control.name,
+            min: Number(control.min),
+            max: Number(control.max),
+            threshHold: Number(control.threshHold),
+            offset: Number(control.offset),
+            bypass: Boolean(control.bypass),
+            automate: Boolean(control.automate),
+          })),
+        };
+        result = await updateUserProduct(formData.uid, updatePayload);
       } else {
-        result = await createUserProduct(payload);
+        // For creation, send all fields
+        const formattedDate = format(new Date(formData.installationDate), "yyyy-MM-dd");
+
+        const sensorsFormatted = (formData.sensors || []).map(sensor => {
+          if (sensor?.sensorId?.value) {
+            return { sensorId: sensor.sensorId.value };
+          } else if (sensor?.sensorId && typeof sensor.sensorId === "string") {
+            return { sensorId: sensor.sensorId };
+          } else if (sensor?.value) {
+            return { sensorId: sensor.value };
+          } else if (typeof sensor === "string") {
+            return { sensorId: sensor };
+          }
+          return null;
+        }).filter(Boolean);
+
+        const createPayload = {
+          userId: formData.userId?.value || formData.userId,
+          productId: formData.productId?.value || formData.productId,
+          uid: formData.uid,
+          alias: formData.alias,
+          type: formData.type,
+          location: formData.location,
+          installationDate: formattedDate,
+          sensors: sensorsFormatted,
+          controls: formData.controls.map(control => ({
+            pin: control.pin,
+            controlId: control.controlId,
+            name: control.name,
+            min: Number(control.min),
+            max: Number(control.max),
+            threshHold: Number(control.threshHold),
+            offset: Number(control.offset),
+            bypass: Boolean(control.bypass),
+            automate: Boolean(control.automate),
+          })),
+        };
+        result = await createUserProduct(createPayload);
       }
 
       Swal.fire("✅ Success", result.message || "User product saved successfully", "success");
@@ -219,10 +346,12 @@ const AddProduct = ({
               <Select
                 name="userId"
                 loadOptions={loadUsers}
+                defaultOptions
                 value={formData.userId}
                 onChange={(opt) => handleChange("userId", opt)}
                 isSearchable
                 placeholder="Select a User"
+                isDisabled={Boolean(product._id)}
                 required
               />
             </div>
@@ -232,10 +361,12 @@ const AddProduct = ({
               <Select
                 name="productId"
                 loadOptions={loadProducts}
+                defaultOptions
                 value={formData.productId}
                 onChange={(opt) => handleChange("productId", opt)}
                 isSearchable
                 placeholder="Select a Product"
+                isDisabled={Boolean(product._id)}
                 required
               />
             </div>
@@ -250,6 +381,7 @@ const AddProduct = ({
                   handleChange(e.target.name, e.target.value)
                 }
                 placeholder="e.g., U123456"
+                disabled={Boolean(product._id)}
                 required
               />
             </div>
@@ -313,6 +445,7 @@ const AddProduct = ({
               <Select
                 name="sensor"
                 loadOptions={loadSensors}
+                defaultOptions
                 onChange={addSensor}
                 isSearchable
                 placeholder="Select a Sensor"
@@ -320,7 +453,7 @@ const AddProduct = ({
               <ul>
                 {formData.sensors.map((sensor, i) => (
                   <li key={i}>
-                    {sensor.sensorId?.label || "Sensor"}
+                    {sensor.sensorId?.label || sensor.sensorId?.name || "Sensor"}
                     <button type="button" onClick={() => removeSensor(i)}>
                       Remove
                     </button>
@@ -376,9 +509,9 @@ const AddProduct = ({
                     Min:
                     <input
                       type="number"
-                      value={control.min}
+                      value={control.min ?? 0}
                       onChange={(e) =>
-                        handleControlChange(index, "min", e.target.value)
+                        handleControlChange(index, "min", Number(e.target.value))
                       }
                       required
                     />
@@ -387,9 +520,9 @@ const AddProduct = ({
                     Max:
                     <input
                       type="number"
-                      value={control.max}
+                      value={control.max ?? 0}
                       onChange={(e) =>
-                        handleControlChange(index, "max", e.target.value)
+                        handleControlChange(index, "max", Number(e.target.value))
                       }
                       required
                     />
@@ -398,12 +531,35 @@ const AddProduct = ({
                     ThreshHold:
                     <input
                       type="number"
-                      value={control.threshHold}
+                      value={control.threshHold ?? 0}
+                      min={control.min ?? 0}
+                      max={control.max ?? 100}
                       onChange={(e) =>
                         handleControlChange(
                           index,
                           "threshHold",
-                          e.target.value
+                          Number(e.target.value)
+                        )
+                      }
+                      required
+                      title={`Must be between ${control.min ?? 0} and ${control.max ?? 100}`}
+                    />
+                    {(control.threshHold < control.min || control.threshHold > control.max) && (
+                      <span style={{ color: 'red', fontSize: '0.85em', display: 'block' }}>
+                        Must be between {control.min} and {control.max}
+                      </span>
+                    )}
+                  </label>
+                  <label>
+                    Offset:
+                    <input
+                      type="number"
+                      value={control.offset ?? 0}
+                      onChange={(e) =>
+                        handleControlChange(
+                          index,
+                          "offset",
+                          Number(e.target.value)
                         )
                       }
                       required
