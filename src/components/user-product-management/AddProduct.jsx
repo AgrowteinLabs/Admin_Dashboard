@@ -259,24 +259,61 @@ const AddProduct = ({
       let result;
 
       if (isEditing) {
-        // For updates, only send the fields that can be updated
+        // Validate UID is present before updating
+        if (!formData.uid || formData.uid.trim() === "") {
+          Swal.fire(
+            "❌ Validation Error",
+            "Product UID is missing. Cannot update without a valid UID.",
+            "error"
+          );
+          return;
+        }
+
+        // Validate that required fields are not empty
+        if (!formData.alias || formData.alias.trim() === "") {
+          Swal.fire(
+            "❌ Validation Error",
+            "Alias is required.",
+            "error"
+          );
+          return;
+        }
+
+        // For updates, send all fields that might need to be updated
         const updatePayload = {
-          alias: formData.alias,
-          location: formData.location,
+          alias: formData.alias.trim(),
+          location: formData.location.trim(),
           type: formData.type,
-          controls: formData.controls.map(control => ({
-            pin: control.pin,
-            controlId: control.controlId,
-            name: control.name,
-            min: Number(control.min),
-            max: Number(control.max),
-            threshHold: Number(control.threshHold),
-            offset: Number(control.offset),
+          sensors: formData.sensors.map(sensor => {
+            if (sensor?.sensorId?.value) {
+              return sensor.sensorId.value;
+            } else if (sensor?.sensorId && typeof sensor.sensorId === "string") {
+              return sensor.sensorId;
+            } else if (sensor?.value) {
+              return sensor.value;
+            } else if (typeof sensor === "string") {
+              return sensor;
+            }
+            return null;
+          }).filter(Boolean),
+        };
+
+        // Only include controls if there are any
+        if (formData.controls && formData.controls.length > 0) {
+          updatePayload.controls = formData.controls.map(control => ({
+            pin: control.pin?.toString() || "",
+            controlId: control.controlId?.toString() || "",
+            name: control.name?.toString() || "",
+            min: Number(control.min) || 0,
+            max: Number(control.max) || 0,
+            threshHold: Number(control.threshHold) || 0,
+            offset: Number(control.offset) || 0,
             bypass: Boolean(control.bypass),
             automate: Boolean(control.automate),
-          })),
-        };
-        console.log("📤 Updating product with payload:", updatePayload);
+            state: control.state || "OFF",
+          }));
+        }
+
         result = await updateUserProduct(formData.uid, updatePayload);
       } else {
         // For creation, send all fields
@@ -284,13 +321,13 @@ const AddProduct = ({
 
         const sensorsFormatted = (formData.sensors || []).map(sensor => {
           if (sensor?.sensorId?.value) {
-            return { sensorId: sensor.sensorId.value };
+            return sensor.sensorId.value;
           } else if (sensor?.sensorId && typeof sensor.sensorId === "string") {
-            return { sensorId: sensor.sensorId };
+            return sensor.sensorId;
           } else if (sensor?.value) {
-            return { sensorId: sensor.value };
+            return sensor.value;
           } else if (typeof sensor === "string") {
-            return { sensorId: sensor };
+            return sensor;
           }
           return null;
         }).filter(Boolean);
@@ -316,7 +353,6 @@ const AddProduct = ({
             automate: Boolean(control.automate),
           })),
         };
-        console.log("📤 Creating product with payload:", createPayload);
         result = await createUserProduct(createPayload);
       }
 
@@ -324,23 +360,12 @@ const AddProduct = ({
       onSubmit(result);
       navigate("/user-product-management?productSaved=true");
     } catch (error) {
-      console.error("❌ Submit error:", error);
-
-      // Extract detailed error message
       let errorMessage = "Failed to save user product";
       if (error?.response?.data?.message) {
         errorMessage = error.response.data.message;
-      } else if (error?.response?.data?.error) {
-        errorMessage = error.response.data.error;
       } else if (error?.message) {
         errorMessage = error.message;
       }
-
-      console.error("📋 Error details:", {
-        status: error?.response?.status,
-        message: errorMessage,
-        data: error?.response?.data
-      });
 
       Swal.fire("❌ Error", errorMessage, "error");
     }
