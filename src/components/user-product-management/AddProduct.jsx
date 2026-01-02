@@ -276,6 +276,7 @@ const AddProduct = ({
             automate: Boolean(control.automate),
           })),
         };
+        console.log("📤 Updating product with payload:", updatePayload);
         result = await updateUserProduct(formData.uid, updatePayload);
       } else {
         // For creation, send all fields
@@ -315,6 +316,7 @@ const AddProduct = ({
             automate: Boolean(control.automate),
           })),
         };
+        console.log("📤 Creating product with payload:", createPayload);
         result = await createUserProduct(createPayload);
       }
 
@@ -323,7 +325,24 @@ const AddProduct = ({
       navigate("/user-product-management?productSaved=true");
     } catch (error) {
       console.error("❌ Submit error:", error);
-      Swal.fire("❌ Error", error?.response?.data?.message || "Failed to save user product", "error");
+
+      // Extract detailed error message
+      let errorMessage = "Failed to save user product";
+      if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error?.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+
+      console.error("📋 Error details:", {
+        status: error?.response?.status,
+        message: errorMessage,
+        data: error?.response?.data
+      });
+
+      Swal.fire("❌ Error", errorMessage, "error");
     }
   };
 
