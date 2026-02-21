@@ -281,6 +281,7 @@ const AddProduct = ({
 
         // For updates, send all fields that might need to be updated
         const updatePayload = {
+          userId: formData.userId?.value || formData.userId,
           alias: formData.alias.trim(),
           location: formData.location.trim(),
           type: formData.type,
@@ -320,16 +321,17 @@ const AddProduct = ({
         const formattedDate = format(new Date(formData.installationDate), "yyyy-MM-dd");
 
         const sensorsFormatted = (formData.sensors || []).map(sensor => {
+          let id = null;
           if (sensor?.sensorId?.value) {
-            return sensor.sensorId.value;
+            id = sensor.sensorId.value;
           } else if (sensor?.sensorId && typeof sensor.sensorId === "string") {
-            return sensor.sensorId;
+            id = sensor.sensorId;
           } else if (sensor?.value) {
-            return sensor.value;
+            id = sensor.value;
           } else if (typeof sensor === "string") {
-            return sensor;
+            id = sensor;
           }
-          return null;
+          return id ? { sensorId: id } : null;
         }).filter(Boolean);
 
         const createPayload = {
@@ -351,8 +353,12 @@ const AddProduct = ({
             offset: Number(control.offset),
             bypass: Boolean(control.bypass),
             automate: Boolean(control.automate),
+            state: control.state || "OFF",
           })),
         };
+        console.log("Create Payload:", createPayload);
+        console.log("Sensors Formatted:", sensorsFormatted);
+
         result = await createUserProduct(createPayload);
       }
 
