@@ -4,6 +4,8 @@ import axios from "axios";
 import "leaflet/dist/leaflet.css";
 import "./AreaCharts.scss";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const UserLocationsMap = () => {
   const [userLocations, setUserLocations] = useState([]); // State to store user locations
 
@@ -12,7 +14,7 @@ const UserLocationsMap = () => {
     const fetchUsersAndGeocode = async () => {
       try {
         // Step 1: Fetch all users from the backend
-        const usersResponse = await axios.get("https://apiv2.agrowtein.com/api/v1/users"); 
+        const usersResponse = await axios.get(`${API_BASE_URL}/users`);
         const users = usersResponse.data;
 
         // Step 2: Geocode each user's city to get coordinates

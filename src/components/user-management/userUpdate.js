@@ -1,16 +1,25 @@
 // userUpdate.js
-import axios from 'axios';
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const userUpdate = async (userId, userData) => {
   try {
-    const response = await axios.put(`https://apiv2.agrowtein.com/api/v1/users/${userId}`, userData, {
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await axios.put(
+      `${API_BASE_URL}/users/${userId}`,
+      userData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    });
+    );
     return response.data;
   } catch (error) {
-    console.error('Error updating user:', error.response ? error.response.data : error.message);
+    console.error(
+      "Error updating user:",
+      error.response ? error.response.data : error.message,
+    );
     throw error;
   }
 };

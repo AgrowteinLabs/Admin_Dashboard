@@ -1,19 +1,18 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 /**
  * Fetch all products for a specific user by userId
  */
 export const userProductsFetch = async (userId) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.get(
-      `https://apiv2.agrowtein.com/api/v1/user/product/${userId}`,
-      {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      }
-    );
+    const response = await axios.get(`${API_BASE_URL}/user/product/${userId}`, {
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching user products:", error);
@@ -28,12 +27,12 @@ export const userProductByUidFetch = async (uid) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.get(
-      `https://apiv2.agrowtein.com/api/v1/user/product/uid/${uid}`,
+      `${API_BASE_URL}/user/product/uid/${uid}`,
       {
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-      }
+      },
     );
     return response.data; // Return the fetched user product
   } catch (error) {
@@ -49,20 +48,20 @@ export const createUserProduct = async (productData) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.post(
-      "https://apiv2.agrowtein.com/api/v1/user/product",
+      `${API_BASE_URL}/user/product`,
       productData,
       {
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-      }
+      },
     );
     return response.data;
   } catch (error) {
     console.error(
       "Error creating user product:",
-      error.response?.data?.message || error.message
+      error.response?.data?.message || error.message,
     );
     throw error;
   }
@@ -77,21 +76,21 @@ export const updateUserProduct = async (uid, updatedData) => {
     const token = localStorage.getItem("token");
 
     const response = await axios.put(
-      `https://apiv2.agrowtein.com/api/v1/user/product/${uid}`,
+      `${API_BASE_URL}/user/product/${uid}`,
       updatedData,
       {
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-      }
+      },
     );
 
     return response.data;
   } catch (error) {
     console.error(
       "Error updating user product:",
-      error.response?.data?.message || error.message
+      error.response?.data?.message || error.message,
     );
     throw error;
   }
@@ -104,12 +103,12 @@ export const deleteUserProduct = async (productId) => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.delete(
-      `https://apiv2.agrowtein.com/api/v1/user/product/${productId}`,
+      `${API_BASE_URL}/user/product/${productId}`,
       {
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
         },
-      }
+      },
     );
     return response.data; // Return the success message after deletion
   } catch (error) {

@@ -1,6 +1,8 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export async function productsFetch() {
   try {
-    const list = await fetch("https://apiv2.agrowtein.com/api/v1/products");
+    const list = await fetch(`${API_BASE_URL}/products`);
     const productslist = await list.json();
     return productslist;
   } catch (err) {
@@ -11,7 +13,7 @@ export async function productsFetch() {
 
 export async function addProduct(newProduct) {
   try {
-    const response = await fetch("https://apiv2.agrowtein.com/api/v1/products", {
+    const response = await fetch(`${API_BASE_URL}/products`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +35,7 @@ export async function addProduct(newProduct) {
 
 export async function deleteProduct(productId) {
   try {
-    const response = await fetch(`https://apiv2.agrowtein.com/api/v1/products/${productId}`, {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
       method: "DELETE",
     });
 
@@ -49,18 +51,17 @@ export async function deleteProduct(productId) {
   }
 }
 
-
 export async function updateProduct(updatedProduct) {
   try {
     const response = await fetch(
-      `https://apiv2.agrowtein.com/api/v1/products/${updatedProduct._id}`,
+      `${API_BASE_URL}/products/${updatedProduct._id}`,
       {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedProduct),
-      }
+      },
     );
 
     if (!response.ok) {
@@ -73,5 +74,3 @@ export async function updateProduct(updatedProduct) {
     throw error; // Rethrow error to be caught in the calling component
   }
 }
-
-

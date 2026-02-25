@@ -1,10 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const sensorCreation = async (sensorData) => {
   try {
-    const response = await axios.post('https://apiv2.agrowtein.com/api/v1/sensors', sensorData, {
+    const response = await axios.post(`${API_BASE_URL}/sensors`, sensorData, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     return response.data;

@@ -1,10 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const deleteSensor = async (sensorId) => {
   try {
-    const response = await axios.delete(`https://apiv2.agrowtein.com/api/v1/sensors/${sensorId}`, {
+    const response = await axios.delete(`${API_BASE_URL}/sensors/${sensorId}`, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     return response.data;

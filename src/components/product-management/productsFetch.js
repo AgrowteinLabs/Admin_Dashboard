@@ -1,17 +1,20 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'https://apiv2.agrowtein.com/api/v1/products';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 /**
  * Fetch all products
  */
 export const productsFetch = async () => {
   try {
-    const response = await axios.get(API_BASE_URL);
+    const response = await axios.get(`${API_BASE_URL}/products`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching products:', error.response?.data || error.message);
-    throw new Error('Failed to fetch products.');
+    console.error(
+      "Error fetching products:",
+      error.response?.data || error.message,
+    );
+    throw new Error("Failed to fetch products.");
   }
 };
 
@@ -26,25 +29,24 @@ export const addProduct = async (productData) => {
       modelNumber: productData.modelNumber?.trim(),
     };
 
-    const response = await axios.post('https://apiv2.agrowtein.com/api/v1/products', sanitized, {
+    const response = await axios.post(`${API_BASE_URL}/products`, sanitized, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
-    return response.data; 
+    return response.data;
   } catch (error) {
     const { status, data } = error.response || {};
-    console.error('Add product error:', data || error.message);
+    console.error("Add product error:", data || error.message);
 
     if (status === 409) {
-      throw new Error('A product with this model number already exists.');
+      throw new Error("A product with this model number already exists.");
     }
 
-    throw new Error(data?.message || 'Failed to add product.');
+    throw new Error(data?.message || "Failed to add product.");
   }
 };
-
 
 /**
  * Update an existing product
@@ -52,7 +54,7 @@ export const addProduct = async (productData) => {
 export const updateProduct = async (productData) => {
   try {
     const { _id, ...rest } = productData;
-    if (!_id) throw new Error('Missing product ID.');
+    if (!_id) throw new Error("Missing product ID.");
 
     const sanitized = {
       name: rest.name?.trim(),
@@ -60,14 +62,21 @@ export const updateProduct = async (productData) => {
       modelNumber: rest.modelNumber?.trim(),
     };
 
-    const response = await axios.put(`${API_BASE_URL}/${_id}`, sanitized, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await axios.put(
+      `${API_BASE_URL}/products/${_id}`,
+      sanitized,
+      {
+        headers: { "Content-Type": "application/json" },
+      },
+    );
 
     return response.data;
   } catch (error) {
-    console.error('Error updating product:', error.response?.data || error.message);
-    throw new Error('Failed to update product.');
+    console.error(
+      "Error updating product:",
+      error.response?.data || error.message,
+    );
+    throw new Error("Failed to update product.");
   }
 };
 
@@ -76,10 +85,15 @@ export const updateProduct = async (productData) => {
  */
 export const deleteProduct = async (productId) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/${productId}`);
+    const response = await axios.delete(
+      `${API_BASE_URL}/products/${productId}`,
+    );
     return response.data;
   } catch (error) {
-    console.error('Error deleting product:', error.response?.data || error.message);
-    throw new Error('Failed to delete product.');
+    console.error(
+      "Error deleting product:",
+      error.response?.data || error.message,
+    );
+    throw new Error("Failed to delete product.");
   }
 };

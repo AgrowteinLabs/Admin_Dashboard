@@ -1,12 +1,14 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 // Function to handle the login API call
 export const loginUser = async (email, password) => {
   try {
     const response = await axios.post(
-      "https://apiv2.agrowtein.com/api/v1/auth/login",
+      `${API_BASE_URL}/auth/login`,
       { email, password },
-      { withCredentials: true }  // Ensures cookies are sent with the request
+      { withCredentials: true }, // Ensures cookies are sent with the request
     );
 
     if (response.status === 200) {
@@ -23,7 +25,9 @@ export const loginUser = async (email, password) => {
   } catch (error) {
     return {
       success: false,
-      message: error.response?.data?.message || "Login failed. Please check your email and password.",
+      message:
+        error.response?.data?.message ||
+        "Login failed. Please check your email and password.",
     };
   }
 };

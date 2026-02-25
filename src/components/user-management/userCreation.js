@@ -1,19 +1,21 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const userCreation = async (userData) => {
   try {
-    const response = await axios.post('https://apiv2.agrowtein.com/api/v1/users', userData, {
+    const response = await axios.post(`${API_BASE_URL}/users`, userData, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
-    console.log('User creation successful:', response.data);
+    console.log("User creation successful:", response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
-      console.error('Error creating user:', error.response.data);
+      console.error("Error creating user:", error.response.data);
     } else {
-      console.error('Error creating user:', error.message);
+      console.error("Error creating user:", error.message);
     }
     throw error;
   }

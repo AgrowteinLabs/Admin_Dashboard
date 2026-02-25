@@ -1,8 +1,10 @@
-import axios from 'axios';
+import axios from "axios";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const sensorsListFetch = async () => {
   try {
-    const response = await axios.get("https://apiv2.agrowtein.com/api/v1/sensors");
+    const response = await axios.get(`${API_BASE_URL}/sensors`);
     return response.data;
   } catch (error) {
     console.error("Error fetching sensors:", error);
