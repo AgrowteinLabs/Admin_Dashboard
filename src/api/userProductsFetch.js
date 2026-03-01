@@ -116,3 +116,32 @@ export const deleteUserProduct = async (productId) => {
     throw error;
   }
 };
+
+/**
+ * Update global mode for a product (affects all controls)
+ * @param {string} uid - Unique identifier of the product
+ * @param {string} mode - "manual" or "automate"
+ * @returns {Promise<{uid: string, mode: string, updatedControls: string[], skippedControls: string[]}>}
+ */
+export const updateProductMode = async (uid, mode) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.post(
+      `${API_BASE_URL}/v1/product/${uid}/mode`,
+      { mode },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error updating product mode:",
+      error.response?.data?.message || error.message,
+    );
+    throw error;
+  }
+};

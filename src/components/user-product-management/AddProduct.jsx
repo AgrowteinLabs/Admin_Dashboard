@@ -27,6 +27,7 @@ const AddProduct = ({
     productId: product.productId || "",
     uid: product.uid || "",
     alias: product.alias || "",
+    mode: product.mode || "manual", // Default to "manual"
     type: product.type || "Farm", // Default to "Farm"
     location: product.location || "",
     installationDate: product.installationDate || "",
@@ -71,7 +72,7 @@ const AddProduct = ({
             }
           }
 
-          // Ensure controls have all required fields including offset
+          // Ensure controls have all required fields including offset and supportsAuto
           const formattedControls = (product.controls || []).map(control => ({
             pin: control.pin || "",
             controlId: control.controlId || "",
@@ -81,6 +82,7 @@ const AddProduct = ({
             threshHold: control.threshHold ?? 0,
             offset: control.offset ?? 0,
             bypass: control.bypass ?? false,
+            supportsAuto: control.supportsAuto ?? true,
             automate: control.automate ?? true,
             state: control.state || "OFF",
           }));
@@ -90,6 +92,7 @@ const AddProduct = ({
             productId: productOption,
             uid: product.uid || "",
             alias: product.alias || "",
+            mode: product.mode || "manual",
             type: product.type || "Farm",
             location: product.location || "",
             installationDate: formattedDate,
@@ -183,10 +186,11 @@ const AddProduct = ({
           controlId: "",
           name: "",
           min: 0,
-          max: 0,
+          max: 100,
           threshHold: 0,
           offset: 0,
           bypass: false,
+          supportsAuto: true,
           automate: true,
           state: "OFF",
         },
@@ -196,12 +200,17 @@ const AddProduct = ({
 
   const handleControlChange = (index, field, value) => {
     const updated = [...formData.controls];
-    if (field === "bypass" || field === "automate") {
+    if (field === "bypass" || field === "automate" || field === "supportsAuto") {
       updated[index][field] = !!value;
+
+      // If supportsAuto is set to false, also set automate to false
+      if (field === "supportsAuto" && !value) {
+        updated[index].automate = false;
+      }
     } else if (field === "min" || field === "max" || field === "threshHold" || field === "offset") {
       updated[index][field] = Number(value);
 
-      // Auto-validate threshHold when min, max, or threshHold changes
+      // Auto-validate threshHold and offset when min, max, threshHold or offset changes
       if (field === "min" || field === "max" || field === "threshHold") {
         const min = field === "min" ? Number(value) : updated[index].min;
         const max = field === "max" ? Number(value) : updated[index].max;
@@ -213,6 +222,22 @@ const AddProduct = ({
             updated[index].threshHold = min;
           } else if (threshold > max) {
             updated[index].threshHold = max;
+          }
+        }
+      }
+
+      // Validate offset is within range
+      if (field === "min" || field === "max" || field === "offset") {
+        const min = field === "min" ? Number(value) : updated[index].min;
+        const max = field === "max" ? Number(value) : updated[index].max;
+        const offset = field === "offset" ? Number(value) : updated[index].offset;
+
+        // Clamp offset to valid range if needed
+        if (min !== undefined && max !== undefined && offset !== undefined) {
+          if (offset < min) {
+            updated[index].offset = min;
+          } else if (offset > max) {
+            updated[index].offset = max;
           }
         }
       }
@@ -235,21 +260,45 @@ const AddProduct = ({
     const isEditing = Boolean(product && product._id);
 
     // Validate controls before submission
-    const invalidControls = formData.controls.filter((control) => {
+    const validationErrors = [];
+
+    formData.controls.forEach((control, idx) => {
       const min = Number(control.min);
       const max = Number(control.max);
       const threshold = Number(control.threshHold);
+      const offset = Number(control.offset);
+      const controlName = control.name || `Control ${idx + 1}`;
 
-      if (threshold < min || threshold > max) {
-        return true;
+      // Validate min < max
+      if (min >= max) {
+        validationErrors.push(`${controlName}: Min must be less than Max`);
       }
-      return false;
+
+      // Validate threshold is within range
+      if (threshold < min || threshold > max) {
+        validationErrors.push(`${controlName}: ThreshHold (${threshold}) must be between ${min} and ${max}`);
+      }
+
+      // Validate offset is within range
+      if (offset < min || offset > max) {
+        validationErrors.push(`${controlName}: Offset (${offset}) must be between ${min} and ${max}`);
+      }
+
+      // Validate automate can only be true if supportsAuto is true
+      if (control.automate && !control.supportsAuto) {
+        validationErrors.push(`${controlName}: Cannot enable automation when hardware doesn't support it`);
+      }
+
+      // Validate controlId length (3-6 characters)
+      if (control.controlId && (control.controlId.length < 3 || control.controlId.length > 6)) {
+        validationErrors.push(`${controlName}: Control ID must be 3-6 characters`);
+      }
     });
 
-    if (invalidControls.length > 0) {
+    if (validationErrors.length > 0) {
       Swal.fire(
         "❌ Validation Error",
-        "ThreshHold must be between Min and Max values for all controls. Please check your control settings.",
+        validationErrors.join('<br>'),
         "error"
       );
       return;
@@ -283,6 +332,7 @@ const AddProduct = ({
         const updatePayload = {
           userId: formData.userId?.value || formData.userId,
           alias: formData.alias.trim(),
+          mode: formData.mode,
           location: formData.location.trim(),
           type: formData.type,
           sensors: formData.sensors.map(sensor => {
@@ -310,6 +360,7 @@ const AddProduct = ({
             threshHold: Number(control.threshHold) || 0,
             offset: Number(control.offset) || 0,
             bypass: Boolean(control.bypass),
+            supportsAuto: Boolean(control.supportsAuto ?? true),
             automate: Boolean(control.automate),
             state: control.state || "OFF",
           }));
@@ -339,6 +390,7 @@ const AddProduct = ({
           productId: formData.productId?.value || formData.productId,
           uid: formData.uid,
           alias: formData.alias,
+          mode: formData.mode,
           type: formData.type,
           location: formData.location,
           installationDate: formattedDate,
@@ -352,6 +404,7 @@ const AddProduct = ({
             threshHold: Number(control.threshHold),
             offset: Number(control.offset),
             bypass: Boolean(control.bypass),
+            supportsAuto: Boolean(control.supportsAuto ?? true),
             automate: Boolean(control.automate),
             state: control.state || "OFF",
           })),
@@ -461,6 +514,30 @@ const AddProduct = ({
                 <option value="Farm">Farm</option>
                 <option value="Other">Other</option>
               </select>
+            </div>
+
+            <div className="form-group">
+              <label>Global Mode:</label>
+              <Tooltip id="mode-help">
+                <strong>Manual:</strong> All controls operate manually only.<br />
+                <strong>Automate:</strong> Enables automation for controls that support it.
+              </Tooltip>
+              <select
+                name="mode"
+                value={formData.mode}
+                onChange={e => handleChange("mode", e.target.value)}
+                required
+                data-tooltip-id="mode-help"
+                style={{ cursor: 'help' }}
+              >
+                <option value="manual">🪜 Manual Mode</option>
+                <option value="automate">🤖 Automate Mode</option>
+              </select>
+              <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
+                {formData.mode === "automate"
+                  ? "Automation enabled for compatible controls"
+                  : "All controls must be operated manually"}
+              </small>
             </div>
 
             <div className="form-group">
@@ -591,6 +668,7 @@ const AddProduct = ({
                           Number(e.target.value)
                         )
                       }
+                      disabled={!control.supportsAuto}
                       required
                       title={`Must be between ${control.min ?? 0} and ${control.max ?? 100}`}
                     />
@@ -599,12 +677,19 @@ const AddProduct = ({
                         Must be between {control.min} and {control.max}
                       </span>
                     )}
+                    {!control.supportsAuto && (
+                      <span style={{ color: '#666', fontSize: '0.85em', display: 'block' }}>
+                        (Disabled - Hardware doesn't support automation)
+                      </span>
+                    )}
                   </label>
                   <label>
                     Offset:
                     <input
                       type="number"
                       value={control.offset ?? 0}
+                      min={control.min ?? 0}
+                      max={control.max ?? 100}
                       onChange={(e) =>
                         handleControlChange(
                           index,
@@ -613,7 +698,13 @@ const AddProduct = ({
                         )
                       }
                       required
+                      title={`Must be between ${control.min ?? 0} and ${control.max ?? 100}`}
                     />
+                    {(control.offset < control.min || control.offset > control.max) && (
+                      <span style={{ color: 'red', fontSize: '0.85em', display: 'block' }}>
+                        Must be between {control.min} and {control.max}
+                      </span>
+                    )}
                   </label>
                   <label>
                     Bypass:
@@ -626,6 +717,22 @@ const AddProduct = ({
                     />
                   </label>
                   <label>
+                    Supports Auto:
+                    <Tooltip id={`supports-auto-help-${index}`}>
+                      Indicates if this control's hardware supports automation.<br />
+                      Disable for manual-only devices.
+                    </Tooltip>
+                    <input
+                      type="checkbox"
+                      checked={control.supportsAuto ?? true}
+                      onChange={(e) =>
+                        handleControlChange(index, "supportsAuto", e.target.checked)
+                      }
+                      data-tooltip-id={`supports-auto-help-${index}`}
+                      style={{ cursor: 'help' }}
+                    />
+                  </label>
+                  <label>
                     Automate:
                     <input
                       type="checkbox"
@@ -633,7 +740,14 @@ const AddProduct = ({
                       onChange={(e) =>
                         handleControlChange(index, "automate", e.target.checked)
                       }
+                      disabled={!control.supportsAuto}
+                      title={!control.supportsAuto ? "Cannot automate - hardware doesn't support it" : "Enable/disable automation for this control"}
                     />
+                    {!control.supportsAuto && (
+                      <span style={{ color: '#999', fontSize: '0.85em', display: 'block' }}>
+                        (Manual only)
+                      </span>
+                    )}
                   </label>
                   <button
                     type="button"
