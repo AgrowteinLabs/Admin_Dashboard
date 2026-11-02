@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   userProductsFetch,
   deleteUserProduct,
@@ -8,13 +8,34 @@ import {
 import "./UserProductPage.scss";
 import AddProduct from "./AddProduct";
 import { FaEdit, FaTrash, FaShieldAlt } from "react-icons/fa";
+import {
+  MdArrowBack,
+  MdLocationOn,
+  MdCalendarToday,
+  MdSensors,
+  MdSearch,
+  MdMemory,
+  MdFilterList,
+} from "react-icons/md";
 import Swal from "sweetalert2";
+
+const formatLocation = (loc) => {
+  if (!loc) return "Location not set";
+  if (typeof loc === "string") return loc;
+  if (typeof loc === "object") {
+    return loc.name || (loc.lat != null && loc.lon != null ? `${loc.lat}, ${loc.lon}` : "Location not set");
+  }
+  return String(loc);
+};
 
 const UserProductsPage = () => {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [userProducts, setUserProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deletedProduct, setDeletedProduct] = useState(null); // For undo
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
 
   useEffect(() => {
     fetchProducts();
@@ -23,7 +44,7 @@ const UserProductsPage = () => {
   const fetchProducts = async () => {
     try {
       const products = await userProductsFetch(userId);
-      setUserProducts(products);
+      setUserProducts(products || []);
     } catch (error) {
       console.error("Error fetching user products:", error);
       Swal.fire("Error", "Failed to load products", "error");
@@ -147,9 +168,67 @@ const UserProductsPage = () => {
     }
   };
 
+  const filteredProducts = userProducts.filter((product) => {
+    const query = searchQuery.trim().toLowerCase();
+    const locString = formatLocation(product.location).toLowerCase();
+    const matchesSearch =
+      !query ||
+      (product.alias && product.alias.toLowerCase().includes(query)) ||
+      (product.uid && product.uid.toLowerCase().includes(query)) ||
+      locString.includes(query);
+
+    const status = product.billingStatus || "ACTIVE";
+    const matchesStatus =
+      statusFilter === "ALL" || status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="user-products-page">
-      <h1>User Products</h1>
+      {/* Top Header Bar */}
+      <div className="user-products-header-bar">
+        <div className="header-left">
+          <button
+            onClick={() => navigate("/user-product-management")}
+            className="back-btn"
+            title="Return to User Management"
+          >
+            <MdArrowBack /> <span>Back to Users</span>
+          </button>
+          <div className="page-title-box">
+            <h1>User Products</h1>
+            <span className="badge-device-count">
+              {userProducts.length} {userProducts.length === 1 ? "Device" : "Devices"}
+            </span>
+          </div>
+        </div>
+
+        <div className="header-controls">
+          <div className="search-input-wrapper">
+            <MdSearch className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by alias, UID, or location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="filter-select-wrapper">
+            <MdFilterList className="filter-icon" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="ALL">All Statuses</option>
+              <option value="ACTIVE">🟢 Active</option>
+              <option value="PAYMENT_HOLD_RECORDING">🟡 Payment Hold</option>
+              <option value="SUSPENDED_BLOCKED">🔴 Suspended</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
       {editingProduct ? (
         <AddProduct
@@ -166,100 +245,148 @@ const UserProductsPage = () => {
         />
       ) : (
         <div className="product-list">
-          {userProducts.length === 0 ? (
-            <p className="no-sensors">No products assigned to this user.</p>
+          {filteredProducts.length === 0 ? (
+            <div className="no-products-empty-state">
+              <p className="empty-title">
+                {userProducts.length === 0
+                  ? "No products assigned to this user."
+                  : "No products match your search or filter."}
+              </p>
+              {searchQuery && (
+                <button
+                  className="reset-search-btn"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setStatusFilter("ALL");
+                  }}
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
           ) : (
-            userProducts.map((product) => {
+            filteredProducts.map((product) => {
               const status = product.billingStatus || "ACTIVE";
               return (
                 <div key={product._id} className="product-card">
-                  <div className="product-header">
-                    <div>
-                      <h3 className="product-name">
+                  {/* Card Header: Title & Monospace UID, + Status Badge */}
+                  <div className="product-card-header">
+                    <div className="title-section">
+                      <h3 className="product-name" title={product.alias || "Unnamed Product"}>
                         {product.alias || "Unnamed Product"}
                       </h3>
-                      <span className="uid-chip">UID: {product.uid}</span>
+                      <span className="uid-chip">
+                        <MdMemory className="chip-icon" />
+                        <code>{product.uid}</code>
+                      </span>
                     </div>
-                    <div className="product-actions">
-                      <button
-                        onClick={() => handleManageBilling(product)}
-                        className="billing-button"
-                        title="Manage Data Display & Billing Access"
-                      >
-                        <FaShieldAlt /> Access
-                      </button>
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="edit-button"
-                      >
-                        <FaEdit /> Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product._id)}
-                        className="delete-button"
-                      >
-                        <FaTrash /> Delete
-                      </button>
+
+                    <div className="status-badge-container">
+                      {status === "ACTIVE" && (
+                        <span className="status-badge badge-active" title="Displaying & Logging Data">
+                          <span className="status-indicator"></span> Active
+                        </span>
+                      )}
+                      {status === "PAYMENT_HOLD_RECORDING" && (
+                        <span
+                          className="status-badge badge-hold"
+                          title={product.statusReason || "Payment pending - Data hidden from user"}
+                        >
+                          <span className="status-indicator"></span> Payment Hold
+                        </span>
+                      )}
+                      {status === "SUSPENDED_BLOCKED" && (
+                        <span
+                          className="status-badge badge-suspended"
+                          title={product.statusReason || "Hardware blocked"}
+                        >
+                          <span className="status-indicator"></span> Suspended
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  <div className="billing-status-row">
-                    <strong>Access Status: </strong>
-                    {status === "ACTIVE" && (
-                      <span className="status-badge badge-active">
-                        🟢 Active (Display & Save)
-                      </span>
-                    )}
-                    {status === "PAYMENT_HOLD_RECORDING" && (
-                      <span
-                        className="status-badge badge-hold"
-                        title={product.statusReason || "Payment pending"}
-                      >
-                        🟡 Payment Hold (Hide Display, Save DB)
-                      </span>
-                    )}
-                    {status === "SUSPENDED_BLOCKED" && (
-                      <span
-                        className="status-badge badge-suspended"
-                        title={product.statusReason || "Suspended"}
-                      >
-                        🔴 Suspended (Cut Off & Dropped)
-                      </span>
-                    )}
-                    {product.statusReason && (
-                      <p className="status-reason-text">
-                        <em>Note: {product.statusReason}</em>
-                      </p>
-                    )}
+                  {product.statusReason && (
+                    <div className="status-reason-banner">
+                      <span>Notice: {product.statusReason}</span>
+                    </div>
+                  )}
+
+                  {/* Card Body */}
+                  <div className="product-card-body">
+                    <p className="product-description">
+                      {typeof product.productId?.description === "string"
+                        ? product.productId.description
+                        : "Automation for Fungiculture."}
+                    </p>
+
+                    <div className="product-metadata-grid">
+                      <div className="meta-item">
+                        <MdLocationOn className="meta-icon" />
+                        <span className="meta-text">{formatLocation(product.location)}</span>
+                      </div>
+                      <div className="meta-item">
+                        <MdCalendarToday className="meta-icon" />
+                        <span className="meta-text">
+                          Installed: {product.installationDate ? new Date(product.installationDate).toLocaleDateString() : "N/A"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Sensors Chips Section */}
+                    <div className="sensors-section">
+                      <div className="sensors-header">
+                        <h4>Sensors</h4>
+                        <span className="sensors-pill-count">
+                          {product.sensors?.length || 0}
+                        </span>
+                      </div>
+
+                      {product.sensors?.length > 0 ? (
+                        <div className="sensors-tags-wrapper">
+                          {product.sensors.map((sensor, index) => {
+                            const sensorName =
+                              sensor.sensorId?.name ||
+                              (typeof sensor.name === "string" ? sensor.name : "Sensor");
+                            return (
+                              <div key={index} className="sensor-tag">
+                                <MdSensors className="sensor-tag-icon" />
+                                <span className="sensor-name">
+                                  {sensorName}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="no-sensors">No sensors attached</p>
+                      )}
+                    </div>
                   </div>
 
-                  <p className="product-description">
-                    {product.productId?.description || "No description"}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {product.location || "Unknown"}
-                  </p>
-                  <p>
-                    <strong>Installation Date:</strong>{" "}
-                    {new Date(product.installationDate).toLocaleDateString()}
-                  </p>
-
-                  <div className="sensors-section">
-                    <h4>Sensors</h4>
-                    {product.sensors?.length > 0 ? (
-                      <ul>
-                        {product.sensors.map((sensor, index) => (
-                          <li key={index} className="sensor-item">
-                            <p>
-                              <strong>Sensor:</strong>{" "}
-                              {sensor.sensorId?.name || "Unknown Sensor"}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="no-sensors">No sensors available.</p>
-                    )}
+                  {/* Card Footer Action Bar */}
+                  <div className="product-card-footer">
+                    <button
+                      onClick={() => handleManageBilling(product)}
+                      className="card-action-btn billing-action"
+                      title="Manage Data Display & Billing Access"
+                    >
+                      <FaShieldAlt /> Access
+                    </button>
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="card-action-btn edit-action"
+                      title="Edit Product"
+                    >
+                      <FaEdit /> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="card-action-btn delete-action"
+                      title="Delete Product"
+                    >
+                      <FaTrash /> Delete
+                    </button>
                   </div>
                 </div>
               );

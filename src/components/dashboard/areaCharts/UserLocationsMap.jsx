@@ -14,13 +14,21 @@ const UserLocationsMap = () => {
     const fetchUsersAndGeocode = async () => {
       try {
         // Step 1: Fetch all users from the backend
-        const usersResponse = await axios.get(`${API_BASE_URL}/users`);
-        const users = usersResponse.data;
+        const token =
+          localStorage.getItem("token") || localStorage.getItem("accessToken");
+        const usersResponse = await axios.get(`${API_BASE_URL}/users`, {
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          withCredentials: true,
+        });
+        const users = Array.isArray(usersResponse.data) ? usersResponse.data : [];
 
         // Step 2: Geocode each user's city to get coordinates
         const apiKey = "f332bb8ac0c846b8869b185d45cf8cd0"; // Your OpenCage API key
         const geocodedUsers = await Promise.all(
           users.map(async (user) => {
+            if (!user.address) return null;
             const { city, state, country } = user.address;
             try {
               const response = await axios.get(

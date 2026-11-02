@@ -29,7 +29,7 @@ const AddProduct = ({
     alias: product.alias || "",
     mode: product.mode || "manual", // Default to "manual"
     type: product.type || "Farm", // Default to "Farm"
-    location: product.location || "",
+    location: (typeof product.location === "object" ? product.location?.name : product.location) || "",
     installationDate: product.installationDate || "",
     sensors: product.sensors || [],
     controls: product.controls || [],
@@ -94,7 +94,7 @@ const AddProduct = ({
             alias: product.alias || "",
             mode: product.mode || "manual",
             type: product.type || "Farm",
-            location: product.location || "",
+            location: (typeof product.location === "object" ? product.location?.name : product.location) || "",
             installationDate: formattedDate,
             sensors: formattedSensors,
             controls: formattedControls,

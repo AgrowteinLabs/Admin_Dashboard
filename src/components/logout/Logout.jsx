@@ -10,9 +10,13 @@ const Logout = () => {
   const handleConfirm = () => {
     setConfirmed(true);
     setTimeout(() => {
-      // Perform any logout logic here (e.g., clearing tokens, session data, etc.)
+      localStorage.removeItem("userId");
+      localStorage.removeItem("token");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("isAuthenticated");
       navigate('/login');
-    }, 2000); // Adjust the timeout as needed
+    }, 1500);
   };
 
   const handleCancel = () => {

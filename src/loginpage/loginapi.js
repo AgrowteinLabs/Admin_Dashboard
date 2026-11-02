@@ -12,10 +12,19 @@ export const loginUser = async (email, password) => {
     );
 
     if (response.status === 200) {
-      const userId = response.data.user._id;
+      const userId = response.data.user?._id || response.data.user?.id;
+      const token = response.data.accessToken || response.data.token;
 
-      // Store only the userId (if needed)
-      localStorage.setItem("userId", userId); // Don't store the token, it's in the cookie
+      if (userId) {
+        localStorage.setItem("userId", userId);
+      }
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("accessToken", token);
+      }
+      if (response.data.refreshToken) {
+        localStorage.setItem("refreshToken", response.data.refreshToken);
+      }
 
       return {
         success: true,
@@ -27,6 +36,7 @@ export const loginUser = async (email, password) => {
       success: false,
       message:
         error.response?.data?.message ||
+        error.response?.data?.error?.message ||
         "Login failed. Please check your email and password.",
     };
   }
