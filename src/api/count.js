@@ -9,6 +9,7 @@ export default async function data(){
     return { usersno, sensorsno };
 }
     catch(err){
-        return err;
+        return err;
+// eslint-disable-next-line no-irregular-whitespace
     }
-};
+}
