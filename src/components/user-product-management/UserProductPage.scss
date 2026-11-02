@@ -246,6 +246,17 @@
             }
           }
 
+          &.badge-technical {
+            background: rgba(2, 136, 209, 0.12);
+            color: #0277bd;
+            border: 1px solid rgba(2, 136, 209, 0.3);
+
+            .status-indicator {
+              background: #0288d1;
+              box-shadow: 0 0 6px rgba(2, 136, 209, 0.6);
+            }
+          }
+
           &.badge-hold {
             background: rgba(245, 124, 0, 0.12);
             color: #e65100;

@@ -57,6 +57,7 @@ const UserProductsPage = () => {
 
   const handleManageBilling = async (product) => {
     const currentStatus = product.billingStatus || "ACTIVE";
+    const currentHoldType = product.holdType || "PAYMENT";
     const currentReason = product.statusReason || "";
 
     const { value: formValues } = await Swal.fire({
@@ -66,6 +67,21 @@ const UserProductsPage = () => {
           <p style="margin-bottom: 12px; color: #555;">
             <strong>UID:</strong> <code>${product.uid}</code>
           </p>
+          <label style="display:block; margin-bottom: 6px; font-weight: 600; color: #333;">Issue / Hold Category:</label>
+          <select id="swal-hold-type" class="swal2-input" style="width: 100%; margin: 0 0 14px 0; height: 42px; font-size: 14px;">
+            <option value="PAYMENT" ${currentHoldType === "PAYMENT" ? "selected" : ""}>
+              💳 Payment Issue (Pending Dues / Invoice)
+            </option>
+            <option value="TECHNICAL" ${currentHoldType === "TECHNICAL" ? "selected" : ""}>
+              🛠️ Technical Issue (Sensor Calibration / Diagnostics)
+            </option>
+            <option value="MAINTENANCE" ${currentHoldType === "MAINTENANCE" ? "selected" : ""}>
+              ⚙️ System Maintenance (Network / Firmware)
+            </option>
+            <option value="OTHER" ${currentHoldType === "OTHER" ? "selected" : ""}>
+              ⚠️ Administrative / General Hold
+            </option>
+          </select>
           <label style="display:block; margin-bottom: 6px; font-weight: 600; color: #333;">Data Display & Storage Status:</label>
           <select id="swal-billing-status" class="swal2-input" style="width: 100%; margin: 0 0 16px 0; height: 42px; font-size: 14px;">
             <option value="ACTIVE" ${currentStatus === "ACTIVE" ? "selected" : ""}>
@@ -90,6 +106,7 @@ const UserProductsPage = () => {
       preConfirm: () => {
         return {
           status: document.getElementById("swal-billing-status").value,
+          holdType: document.getElementById("swal-hold-type").value,
           reason: document.getElementById("swal-billing-reason").value,
         };
       },
@@ -100,7 +117,8 @@ const UserProductsPage = () => {
         await updateDeviceBillingStatus(
           product.uid,
           formValues.status,
-          formValues.reason
+          formValues.reason,
+          formValues.holdType
         );
         setUserProducts((prev) =>
           prev.map((p) =>
@@ -108,6 +126,7 @@ const UserProductsPage = () => {
               ? {
                   ...p,
                   billingStatus: formValues.status,
+                  holdType: formValues.holdType,
                   statusReason: formValues.reason,
                 }
               : p
@@ -289,10 +308,15 @@ const UserProductsPage = () => {
                       )}
                       {status === "PAYMENT_HOLD_RECORDING" && (
                         <span
-                          className="status-badge badge-hold"
-                          title={product.statusReason || "Payment pending - Data hidden from user"}
+                          className={`status-badge ${product.holdType === "TECHNICAL" || product.holdType === "MAINTENANCE" ? "badge-technical" : "badge-hold"}`}
+                          title={product.statusReason || "Data hidden from user"}
                         >
-                          <span className="status-indicator"></span> Payment Hold
+                          <span className="status-indicator"></span>{" "}
+                          {product.holdType === "TECHNICAL"
+                            ? "🛠️ Technical Hold"
+                            : product.holdType === "MAINTENANCE"
+                              ? "⚙️ Maintenance"
+                              : "💳 Payment Hold"}
                         </span>
                       )}
                       {status === "SUSPENDED_BLOCKED" && (
@@ -300,7 +324,10 @@ const UserProductsPage = () => {
                           className="status-badge badge-suspended"
                           title={product.statusReason || "Hardware blocked"}
                         >
-                          <span className="status-indicator"></span> Suspended
+                          <span className="status-indicator"></span>{" "}
+                          {product.holdType === "TECHNICAL"
+                            ? "🛠️ Tech Cut-Off"
+                            : "🔴 Suspended"}
                         </span>
                       )}
                     </div>

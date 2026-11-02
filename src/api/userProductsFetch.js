@@ -153,13 +153,18 @@ export const updateProductMode = async (uid, mode) => {
  * @param {"ACTIVE" | "PAYMENT_HOLD_RECORDING" | "SUSPENDED_BLOCKED"} billingStatus
  * @param {string} reason
  */
-export const updateDeviceBillingStatus = async (uid, billingStatus, reason) => {
+export const updateDeviceBillingStatus = async (
+  uid,
+  billingStatus,
+  reason,
+  holdType = "PAYMENT"
+) => {
   try {
     const token =
       localStorage.getItem("token") || localStorage.getItem("accessToken");
     const response = await axios.patch(
       `${API_BASE_URL}/admin/devices/${uid}/billing-status`,
-      { billingStatus, reason },
+      { billingStatus, reason, holdType },
       {
         headers: {
           "Content-Type": "application/json",
