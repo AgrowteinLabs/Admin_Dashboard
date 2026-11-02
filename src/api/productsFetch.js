@@ -25,6 +25,7 @@ export async function addProduct(newProduct) {
       throw new Error("Failed to add product");
     }
 
+    // eslint-disable-next-line no-unused-vars
     const addedProduct = await response.json();
     return response.json(); // Return the added product (with _id)
   } catch (error) {
