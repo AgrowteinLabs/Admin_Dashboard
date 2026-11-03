@@ -1,18 +1,9 @@
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "./apiClient";
 
 // Function to create a new user
 export const userCreation = async (userData) => {
-  const token = localStorage.getItem("token"); // Get token from localStorage or other storage
-
   try {
-    const response = await axios.post(`${API_BASE_URL}/users`, userData, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // Include the token here
-      },
-    });
+    const response = await apiClient.post("/users", userData);
     return response.data;
   } catch (error) {
     handleError(error);
@@ -21,19 +12,8 @@ export const userCreation = async (userData) => {
 
 // Function to update an existing user
 export const updateUser = async (userId, userData) => {
-  const token = localStorage.getItem("token"); // Get token from localStorage or other storage
-
   try {
-    const response = await axios.put(
-      `${API_BASE_URL}/users/${userId}`,
-      userData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Include the token here
-        },
-      },
-    );
+    const response = await apiClient.put(`/users/${userId}`, userData);
     return response.data;
   } catch (error) {
     handleError(error);

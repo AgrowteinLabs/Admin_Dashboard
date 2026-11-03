@@ -1,10 +1,9 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "./apiClient";
 
 export async function productsFetch() {
   try {
-    const list = await fetch(`${API_BASE_URL}/products`);
-    const productslist = await list.json();
-    return productslist;
+    const response = await apiClient.get("/products");
+    return response.data;
   } catch (err) {
     console.error("Error fetching products:", err);
     throw err;
@@ -13,39 +12,18 @@ export async function productsFetch() {
 
 export async function addProduct(newProduct) {
   try {
-    const response = await fetch(`${API_BASE_URL}/products`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newProduct),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to add product");
-    }
-
-    // eslint-disable-next-line no-unused-vars
-    const addedProduct = await response.json();
-    return response.json(); // Return the added product (with _id)
+    const response = await apiClient.post("/products", newProduct);
+    return response.data;
   } catch (error) {
     console.error("Error adding product:", error);
-    throw error; // Rethrow error for further handling in the component
+    throw error;
   }
 }
 
 export async function deleteProduct(productId) {
   try {
-    const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
-      method: "DELETE",
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to delete product");
-    }
-
-    const data = await response.json(); // Optional: Get response data if required
-    return data; // Return the response data or confirmation message
+    const response = await apiClient.delete(`/products/${productId}`);
+    return response.data;
   } catch (error) {
     console.error("Error deleting product:", error);
     throw error;
@@ -54,24 +32,13 @@ export async function deleteProduct(productId) {
 
 export async function updateProduct(updatedProduct) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/products/${updatedProduct._id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedProduct),
-      },
+    const response = await apiClient.put(
+      `/products/${updatedProduct._id}`,
+      updatedProduct
     );
-
-    if (!response.ok) {
-      throw new Error("Failed to update product");
-    }
-
-    return response.json(); // Return the updated product
+    return response.data;
   } catch (error) {
     console.error("Error updating product:", error);
-    throw error; // Rethrow error to be caught in the calling component
+    throw error;
   }
 }

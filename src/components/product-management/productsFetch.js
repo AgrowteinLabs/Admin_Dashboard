@@ -1,18 +1,16 @@
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "../../api/apiClient";
 
 /**
  * Fetch all products
  */
 export const productsFetch = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/products`);
+    const response = await apiClient.get("/products");
     return response.data;
   } catch (error) {
     console.error(
       "Error fetching products:",
-      error.response?.data || error.message,
+      error.response?.data || error.message
     );
     throw new Error("Failed to fetch products.");
   }
@@ -29,12 +27,7 @@ export const addProduct = async (productData) => {
       modelNumber: productData.modelNumber?.trim(),
     };
 
-    const response = await axios.post(`${API_BASE_URL}/products`, sanitized, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
+    const response = await apiClient.post("/products", sanitized);
     return response.data;
   } catch (error) {
     const { status, data } = error.response || {};
@@ -62,19 +55,12 @@ export const updateProduct = async (productData) => {
       modelNumber: rest.modelNumber?.trim(),
     };
 
-    const response = await axios.put(
-      `${API_BASE_URL}/products/${_id}`,
-      sanitized,
-      {
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-
+    const response = await apiClient.put(`/products/${_id}`, sanitized);
     return response.data;
   } catch (error) {
     console.error(
       "Error updating product:",
-      error.response?.data || error.message,
+      error.response?.data || error.message
     );
     throw new Error("Failed to update product.");
   }
@@ -85,14 +71,12 @@ export const updateProduct = async (productData) => {
  */
 export const deleteProduct = async (productId) => {
   try {
-    const response = await axios.delete(
-      `${API_BASE_URL}/products/${productId}`,
-    );
+    const response = await apiClient.delete(`/products/${productId}`);
     return response.data;
   } catch (error) {
     console.error(
       "Error deleting product:",
-      error.response?.data || error.message,
+      error.response?.data || error.message
     );
     throw new Error("Failed to delete product.");
   }

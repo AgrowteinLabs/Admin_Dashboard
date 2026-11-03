@@ -1,29 +1,14 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "../../../api/apiClient";
 
 export default async function data() {
   try {
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("accessToken");
-    const headers = {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
+    const usersRes = await apiClient.get("/users");
+    const sensorsRes = await apiClient.get("/sensors");
+
+    return {
+      usersdata: usersRes.data,
+      sensorsdata: sensorsRes.data,
     };
-
-    const Users = await fetch(`${API_BASE_URL}/users`, {
-      method: "GET",
-      headers,
-      credentials: "include",
-    });
-    const usersdata = await Users.json();
-
-    const Sensors = await fetch(`${API_BASE_URL}/sensors`, {
-      method: "GET",
-      headers,
-      credentials: "include",
-    });
-    const sensorsdata = await Sensors.json();
-
-    return { usersdata, sensorsdata };
   } catch (err) {
     console.error("Error fetching data:", err);
     return { error: err.message || "An error occurred" };

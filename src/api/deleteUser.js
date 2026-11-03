@@ -1,17 +1,8 @@
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "./apiClient";
 
 export default async function userDelete(userId) {
   try {
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("accessToken");
-    const response = await axios.delete(`${API_BASE_URL}/users/${userId}`, {
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      withCredentials: true,
-    });
+    const response = await apiClient.delete(`/users/${userId}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting user:", error);

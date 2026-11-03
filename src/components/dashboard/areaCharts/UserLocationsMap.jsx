@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import axios from "axios";
+import apiClient from "../../../api/apiClient";
 import "leaflet/dist/leaflet.css";
 import "./AreaCharts.scss";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const UserLocationsMap = () => {
   const [userLocations, setUserLocations] = useState([]); // State to store user locations
@@ -14,14 +13,7 @@ const UserLocationsMap = () => {
     const fetchUsersAndGeocode = async () => {
       try {
         // Step 1: Fetch all users from the backend
-        const token =
-          localStorage.getItem("token") || localStorage.getItem("accessToken");
-        const usersResponse = await axios.get(`${API_BASE_URL}/users`, {
-          headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          withCredentials: true,
-        });
+        const usersResponse = await apiClient.get("/users");
         const users = Array.isArray(usersResponse.data) ? usersResponse.data : [];
 
         // Step 2: Geocode each user's city to get coordinates

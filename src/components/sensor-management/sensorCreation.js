@@ -1,14 +1,8 @@
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "../../api/apiClient";
 
 const sensorCreation = async (sensorData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/sensors`, sensorData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await apiClient.post("/sensors", sensorData);
     return response.data;
   } catch (error) {
     console.error("Error creating sensor:", error);

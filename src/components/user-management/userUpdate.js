@@ -1,28 +1,13 @@
-// userUpdate.js
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "../../api/apiClient";
 
 const userUpdate = async (userId, userData) => {
   try {
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("accessToken");
-    const response = await axios.put(
-      `${API_BASE_URL}/users/${userId}`,
-      userData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        withCredentials: true,
-      },
-    );
+    const response = await apiClient.put(`/users/${userId}`, userData);
     return response.data;
   } catch (error) {
     console.error(
       "Error updating user:",
-      error.response ? error.response.data : error.message,
+      error.response ? error.response.data : error.message
     );
     throw error;
   }

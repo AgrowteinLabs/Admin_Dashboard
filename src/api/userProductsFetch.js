@@ -1,18 +1,11 @@
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "./apiClient";
 
 /**
  * Fetch all products for a specific user by userId
  */
 export const userProductsFetch = async (userId) => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get(`${API_BASE_URL}/user/product/${userId}`, {
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    });
+    const response = await apiClient.get(`/user/product/${userId}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching user products:", error);
@@ -25,16 +18,8 @@ export const userProductsFetch = async (userId) => {
  */
 export const userProductByUidFetch = async (uid) => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get(
-      `${API_BASE_URL}/user/product/uid/${uid}`,
-      {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
-    return response.data; // Return the fetched user product
+    const response = await apiClient.get(`/user/product/uid/${uid}`);
+    return response.data;
   } catch (error) {
     console.error("Error fetching user product by UID:", error);
     throw error;
@@ -46,22 +31,12 @@ export const userProductByUidFetch = async (uid) => {
  */
 export const createUserProduct = async (productData) => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.post(
-      `${API_BASE_URL}/user/product`,
-      productData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
+    const response = await apiClient.post("/user/product", productData);
     return response.data;
   } catch (error) {
     console.error(
       "Error creating user product:",
-      error.response?.data?.message || error.message,
+      error.response?.data?.message || error.message
     );
     throw error;
   }
@@ -70,27 +45,14 @@ export const createUserProduct = async (productData) => {
 /**
  * Update an existing user product by UID
  */
-
 export const updateUserProduct = async (uid, updatedData) => {
   try {
-    const token = localStorage.getItem("token");
-
-    const response = await axios.put(
-      `${API_BASE_URL}/user/product/${uid}`,
-      updatedData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
-
+    const response = await apiClient.put(`/user/product/${uid}`, updatedData);
     return response.data;
   } catch (error) {
     console.error(
       "Error updating user product:",
-      error.response?.data?.message || error.message,
+      error.response?.data?.message || error.message
     );
     throw error;
   }
@@ -101,16 +63,8 @@ export const updateUserProduct = async (uid, updatedData) => {
  */
 export const deleteUserProduct = async (productId) => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.delete(
-      `${API_BASE_URL}/user/product/${productId}`,
-      {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
-    return response.data; // Return the success message after deletion
+    const response = await apiClient.delete(`/user/product/${productId}`);
+    return response.data;
   } catch (error) {
     console.error("Error deleting user product:", error);
     throw error;
@@ -125,27 +79,16 @@ export const deleteUserProduct = async (productId) => {
  */
 export const updateProductMode = async (uid, mode) => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.post(
-      `${API_BASE_URL}/v1/product/${uid}/mode`,
-      { mode },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
+    const response = await apiClient.post(`/v1/product/${uid}/mode`, { mode });
     return response.data;
   } catch (error) {
     console.error(
       "Error updating product mode:",
-      error.response?.data?.message || error.message,
+      error.response?.data?.message || error.message
     );
     throw error;
   }
 };
-
 
 /**
  * Update billing status for a device (Admin only)
@@ -160,17 +103,9 @@ export const updateDeviceBillingStatus = async (
   holdType = "PAYMENT"
 ) => {
   try {
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("accessToken");
-    const response = await axios.patch(
-      `${API_BASE_URL}/admin/devices/${uid}/billing-status`,
-      { billingStatus, reason, holdType },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      }
+    const response = await apiClient.patch(
+      `/admin/devices/${uid}/billing-status`,
+      { billingStatus, reason, holdType }
     );
     return response.data;
   } catch (error) {

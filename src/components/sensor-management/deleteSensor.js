@@ -1,14 +1,8 @@
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "../../api/apiClient";
 
 const deleteSensor = async (sensorId) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}/sensors/${sensorId}`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await apiClient.delete(`/sensors/${sensorId}`);
     return response.data;
   } catch (error) {
     console.error("Error deleting sensor:", error);

@@ -1,18 +1,8 @@
-import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import apiClient from "../../api/apiClient";
 
 export const userCreation = async (userData) => {
   try {
-    const token =
-      localStorage.getItem("token") || localStorage.getItem("accessToken");
-    const response = await axios.post(`${API_BASE_URL}/users`, userData, {
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      withCredentials: true,
-    });
+    const response = await apiClient.post("/users", userData);
     console.log("User creation successful:", response.data);
     return response.data;
   } catch (error) {
